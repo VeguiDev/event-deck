@@ -9,7 +9,8 @@ public class Router {
 
     private final JPanel root;
     private final CardLayout layout;
-    private final Map<Routes, JPanel> screens = new EnumMap<>(Routes.class);
+    private final Map<Routes, View> screens = new EnumMap<>(Routes.class);
+    private View currentView;
 
     public Router() {
         this.layout = new CardLayout();
@@ -20,12 +21,19 @@ public class Router {
         return root;
     }
 
-    public void register(Routes route, JPanel panel) {
+    public void register(Routes route, View panel) {
         screens.put(route, panel);
         root.add(panel, route.name());
     }
 
     public void navigate(Routes route) {
+        if(currentView != null) {
+            currentView.onHide();
+        }
+        currentView = screens.get(route);
+        if(currentView != null) {
+            currentView.onShow();
+        }
         layout.show(root, route.name());
     }
 
