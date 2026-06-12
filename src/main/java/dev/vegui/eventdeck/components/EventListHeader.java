@@ -16,10 +16,13 @@ public class EventListHeader extends JPanel {
         );
 
         JLabel label = new JLabel("Tus eventos");
+        label.setFont(
+                label.getFont().deriveFont(Font.BOLD, 18f)
+        );
         JButton button = new JButton("Crear");
 
         button.addActionListener((e) ->{
-            Main.getRouter().navigate(Routes.EVENT_CREATE);
+            Main.getState().getRouter().navigate(Routes.EVENT_CREATE);
         });
 
         add(label, BorderLayout.WEST);

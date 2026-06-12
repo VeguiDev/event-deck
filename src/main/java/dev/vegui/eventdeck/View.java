@@ -23,4 +23,11 @@ public abstract class View extends JPanel {
     public void reload() {
     }
 
+    /**
+     * Obtiene el estado global de la aplicación.
+     */
+    public MainState getMainState() {
+        return Main.getState();
+    }
+
 }

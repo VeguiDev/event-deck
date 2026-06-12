@@ -13,6 +13,10 @@ public class Event {
     private Duration duration;
     private EventLocation location;
 
+    public Event() {
+        this.location = new EventLocation();
+    }
+
     public Event(String title, String description, LocalDateTime startDate, Duration duration, EventLocation location) {
         this.id = UUID.randomUUID();
         this.title = title;

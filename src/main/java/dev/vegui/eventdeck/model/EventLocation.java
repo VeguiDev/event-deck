@@ -7,6 +7,8 @@ public class EventLocation {
     private String province;
     private String country;
 
+    public EventLocation() {}
+
     public EventLocation(
             String venueName,
             String street,

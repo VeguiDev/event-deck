@@ -4,7 +4,8 @@ import dev.vegui.eventdeck.model.EventLocation;
 import dev.vegui.eventdeck.repository.EventRepository;
 import dev.vegui.eventdeck.repository.InMemoryEventRepository;
 import dev.vegui.eventdeck.services.EventService;
-import dev.vegui.eventdeck.views.CreateEventView;
+import dev.vegui.eventdeck.views.EventCreateView;
+import dev.vegui.eventdeck.views.EventDetailsView;
 import dev.vegui.eventdeck.views.EventListView;
 
 import javax.swing.*;
@@ -12,9 +13,9 @@ import javax.swing.*;
 public class Main {
 
     private static MainFrame mainFrame;
-    private static Router router;
     private static EventRepository eventRepository;
     private static EventService service;
+    private static MainState mainState;
 
     static void main() {
         eventRepository = new InMemoryEventRepository();
@@ -30,7 +31,7 @@ public class Main {
 
         service.create(
                 "Tottapalooza 2026",
-                "Tottapalooza 2026",
+                "Tottapalooza 2026 qwhe8iquwheiqwneiuqw neinqwue niqwne uiqnwi nqwpo uneio qnwep 9iqunwie ounqwione ioqwun epoiqwn epoqwn peon qnop",
                 java.time.LocalDateTime.now(),
                 java.time.Duration.ofHours(2),
                 new EventLocation( "Movistar Arena", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
@@ -44,21 +45,25 @@ public class Main {
             exception.printStackTrace();
         }
 
-
-
         javax.swing.SwingUtilities.invokeLater(() -> {
-            router = new Router();
+            Router router = new Router();
+            mainState = new MainState(router);
             mainFrame = new MainFrame(router);
-            router.register(Routes.EVENTS_LIST, new EventListView());
-            router.register(Routes.EVENT_CREATE, new CreateEventView());
-
+            setupRouter(router);
             router.navigate(Routes.EVENTS_LIST);
+
             mainFrame.setVisible(true);
         });
     }
 
-    public static Router getRouter() {
-        return router;
+    private static void setupRouter(Router router) {
+        router.register(Routes.EVENTS_LIST, new EventListView());
+        router.register(Routes.EVENT_CREATE, new EventCreateView());
+        router.register(Routes.EVENT_DETAIL, new EventDetailsView());
+    }
+
+    public static MainState getState() {
+        return mainState;
     }
 
     public static MainFrame getMainFrame() {

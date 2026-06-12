@@ -1,6 +1,9 @@
 package dev.vegui.eventdeck.components;
 
+import dev.vegui.eventdeck.Main;
+import dev.vegui.eventdeck.Routes;
 import dev.vegui.eventdeck.model.Event;
+import dev.vegui.eventdeck.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,15 +28,37 @@ public class EventCard extends RoundedPanel {
 
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JLabel title = new JLabel(event.getTitle());
-        panel.add(title, BorderLayout.WEST);
+        JLabel title = new JLabel(Util.truncateWithEllipsis(event.getTitle(), 20));
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        title.setFont(
+                title.getFont().deriveFont(Font.BOLD, 14f)
+        );
+        panel.add(title);
 
-        JLabel description = new JLabel(event.getDescription());
-        panel.add(description, BorderLayout.EAST);
+        JTextArea description = new JTextArea(
+                Util.truncateWithEllipsis(event.getDescription(), 46)
+        );
+        description.setAlignmentX(Component.LEFT_ALIGNMENT);
+        description.setLineWrap(true);
+        description.setWrapStyleWord(true);
+        description.setEditable(false);
+        description.setOpaque(false);
+        description.setFocusable(false);
+        description.setBackground(new Color(0, 0, 0, 0));
+        description.setBorder(null);
+
+        description.setPreferredSize(new Dimension(180, 45));
+
+        panel.add(description);
 
         JButton details = new JButton("details");
-        panel.add(details, BorderLayout.SOUTH);
+        details.setAlignmentX(Component.LEFT_ALIGNMENT);
+        details.addActionListener((e) -> {
+            Main.getState().setCurrentEvent(this.event);
+            Main.getState().getRouter().navigate(Routes.EVENT_DETAIL);
+        });
 
+        panel.add(details);
         add(panel);
     }
 
