@@ -34,32 +34,34 @@ public class EventForm extends JPanel {
     private JTextField country;
     private JTextField street;
 
-    public EventForm(EventService eventService, Event event) {
-        this(eventService);
-        this.event = event;
-        this.isEditMode = true;
+    private JButton submitButton;
+    private JButton deleteButton;
 
+    public EventForm(EventService eventService, Event event) {
+        this.eventService = eventService;
+        this.event = event;
+        this.isEditMode = event.getId() != null;
+        setupForm();
         loadData();
     }
 
     public EventForm(EventService eventService) {
-
             this.eventService = eventService;
-
-            setLayout(new FlowLayout(FlowLayout.LEFT));
-
-            wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-            add(wrapper);
             setupForm();
     }
 
     private void setupForm() {
         wrapper.removeAll();
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        add(wrapper);
+
         addWrapper(new JLabel("Titulo"));
         title = new JTextField(20);
         addWrapper(title);
 
-        addWrapper(new JLabel("Description"));
+        addWrapper(new JLabel("Descripcion"));
 
         description = new JTextArea(5, 20);
         description.setLineWrap(true);
@@ -78,10 +80,10 @@ public class EventForm extends JPanel {
 
         dateSpinner.setEditor(editor);
 
-        addWrapper(new JLabel("Start Date"));
+        addWrapper(new JLabel("Día y hora de inicio"));
         addWrapper(dateSpinner);
 
-        addWrapper(new JLabel("Duration (hours)"));
+        addWrapper(new JLabel("Duración (horas)"));
 
         durationSpinner = new JSpinner(
                 new SpinnerNumberModel(
@@ -96,10 +98,20 @@ public class EventForm extends JPanel {
 
         setupLocationForm();
 
-        JButton submitButton = new JButton("Submit");
+        JPanel actions = new JPanel();
+        actions.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        submitButton = new JButton("Confirmar");
         submitButton.addActionListener(this::onSubmit);
 
-        addWrapper(submitButton);
+        deleteButton = new JButton("Eliminar");
+        deleteButton.addActionListener(this::onDelete);
+
+        actions.add(submitButton);
+        if(this.isEditMode) {
+            actions.add(deleteButton);
+        }
+        addWrapper(actions);
     }
 
     private void setupLocationForm() {
@@ -217,7 +229,26 @@ public class EventForm extends JPanel {
         }
 
     }
-    
+
+    private void onDelete(ActionEvent e) {
+
+        if(event == null) return;
+
+        int option = JOptionPane.showConfirmDialog(
+                this,
+                "Estás seguro de que quieres eliminar este evento?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if(option == JOptionPane.YES_OPTION) {
+            this.eventService.delete(this.event);
+
+            Main.getState().getRouter().navigate(Routes.EVENTS_LIST);
+        }
+
+    }
+
     private void addWrapper(JComponent component) {
         component.setAlignmentX(Component.LEFT_ALIGNMENT);
         wrapper.add(component);
