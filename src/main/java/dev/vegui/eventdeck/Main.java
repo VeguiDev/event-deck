@@ -9,15 +9,32 @@ import dev.vegui.eventdeck.views.EventDetailsView;
 import dev.vegui.eventdeck.views.EventListView;
 
 import javax.swing.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Logger;
 
 public class Main {
+    public static Logger logger = Logger.getLogger("EventDeck");
 
     private static MainFrame mainFrame;
     private static EventRepository eventRepository;
     private static EventService service;
     private static MainState mainState;
+    private static Connection connection;
 
     static void main() {
+
+        try {
+            connection = Database.connect();
+
+            DatabaseMigrations.runMigrations(connection);
+        } catch (SQLException e) {
+
+            logger.severe("Error connecting to database");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
         eventRepository = new InMemoryEventRepository();
         service = new EventService(eventRepository);
 
