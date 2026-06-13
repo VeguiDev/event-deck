@@ -1,0 +1,97 @@
+classDiagram
+    direction LR
+
+    class Event {
+        -UUID id
+        -String title
+        -String description
+        -LocalDateTime startDate
+        -int duration
+        -EventLocation location
+        +Event()
+        +Event(UUID id, String title, String description, LocalDateTime startDate, int duration, EventLocation location)
+        +Event(String title, String description, LocalDateTime startDate, int duration, EventLocation location)
+        +UUID getId()
+        +void setId(UUID id)
+        +String getTitle()
+        +void setTitle(String title)
+        +String getDescription()
+        +void setDescription(String description)
+        +LocalDateTime getStartDate()
+        +void setStartDate(LocalDateTime startDate)
+        +int getDuration()
+        +void setDuration(int duration)
+        +EventLocation getLocation()
+        +void setLocation(EventLocation location)
+    }
+
+    class EventLocation {
+        -String venueName
+        -String street
+        -String city
+        -String province
+        -String country
+        +EventLocation()
+        +EventLocation(String venueName, String street, String city, String province, String country)
+        +String getFormattedAddress()
+        +String getVenueName()
+        +void setVenueName(String venueName)
+        +String getStreet()
+        +void setStreet(String street)
+        +String getCity()
+        +void setCity(String city)
+        +String getProvince()
+        +void setProvince(String province)
+        +String getCountry()
+        +void setCountry(String country)
+        +String toString()
+    }
+
+    class EventRepository {
+        <<interface>>
+        +void save(Event event)
+        +Optional~Event~ findById(UUID id)
+        +List~Event~ findAll()
+        +List~Event~ findLike(String query)
+        +void delete(UUID id)
+    }
+
+    class InMemoryEventRepository {
+        -Map~UUID, Event~ events
+        +void save(Event event)
+        +Optional~Event~ findById(UUID id)
+        +List~Event~ findAll()
+        +List~Event~ findLike(String query)
+        +void delete(UUID id)
+    }
+
+    class SQLiteEventRepository {
+        -Connection connection
+        +SQLiteEventRepository(Connection connection)
+        +void save(Event event)
+        +Optional~Event~ findById(UUID id)
+        +List~Event~ findAll()
+        +List~Event~ findLike(String query)
+        +void delete(UUID id)
+        +Event eventFromResultSet(ResultSet resultSet)
+    }
+
+    class EventService {
+        -EventRepository eventRepository
+        +EventService(EventRepository eventRepository)
+        +List~Event~ findAll()
+        +List~Event~ findLike(String query)
+        +Optional~Event~ findById(UUID id)
+        +void create(String title, String description, LocalDateTime startDate, int duration, EventLocation location)
+        +void update(Event event)
+        +void delete(Event event)
+        +void delete(UUID id)
+    }
+
+    Event "1" *-- "1" EventLocation : location
+    EventRepository <|.. InMemoryEventRepository
+    EventRepository <|.. SQLiteEventRepository
+    EventService --> EventRepository : uses
+    EventService ..> Event : creates/updates
+    EventService ..> EventLocation : validates
+    EventRepository ..> Event : persists
