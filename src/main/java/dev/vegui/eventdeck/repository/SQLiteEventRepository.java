@@ -147,6 +147,7 @@ public class SQLiteEventRepository implements EventRepository {
         String sql = "DELETE FROM events WHERE id = ?";
 
         try(PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, id.toString());
             statement.execute();
         } catch (SQLException e) {
             Main.logger.severe(e.getMessage());
