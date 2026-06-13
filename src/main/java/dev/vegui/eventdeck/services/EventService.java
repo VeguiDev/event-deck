@@ -5,7 +5,6 @@ import dev.vegui.eventdeck.model.EventLocation;
 import dev.vegui.eventdeck.repository.EventRepository;
 import dev.vegui.eventdeck.util.Validators;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +34,7 @@ public class EventService {
             String title,
             String description,
             LocalDateTime startDate,
-            Duration duration,
+            int duration,
             EventLocation location
     ) {
         Validators.field("title", title).notEmpty().maxLength(255);

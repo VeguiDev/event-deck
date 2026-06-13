@@ -3,6 +3,7 @@ package dev.vegui.eventdeck;
 import dev.vegui.eventdeck.model.EventLocation;
 import dev.vegui.eventdeck.repository.EventRepository;
 import dev.vegui.eventdeck.repository.InMemoryEventRepository;
+import dev.vegui.eventdeck.repository.SQLiteEventRepository;
 import dev.vegui.eventdeck.services.EventService;
 import dev.vegui.eventdeck.views.EventCreateView;
 import dev.vegui.eventdeck.views.EventDetailsView;
@@ -35,24 +36,24 @@ public class Main {
             System.exit(-1);
         }
 
-        eventRepository = new InMemoryEventRepository();
+        eventRepository = new SQLiteEventRepository(connection);
         service = new EventService(eventRepository);
 
-        service.create(
-                "AGS 2026",
-                "VISA Argentina Game Show 2026",
-                java.time.LocalDateTime.now(),
-                java.time.Duration.ofHours(2),
-                new EventLocation( "Mi kasa", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
-        );
-
-        service.create(
-                "Tottapalooza 2026",
-                "Tottapalooza 2026 qwhe8iquwheiqwneiuqw neinqwue niqwne uiqnwi nqwpo uneio qnwep 9iqunwie ounqwione ioqwun epoiqwn epoqwn peon qnop",
-                java.time.LocalDateTime.now(),
-                java.time.Duration.ofHours(2),
-                new EventLocation( "Movistar Arena", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
-        );
+//        service.create(
+//                "AGS 2026",
+//                "VISA Argentina Game Show 2026",
+//                java.time.LocalDateTime.now(),
+//                2,
+//                new EventLocation( "Mi kasa", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
+//        );
+//
+//        service.create(
+//                "Tottapalooza 2026",
+//                "Tottapalooza 2026 qwhe8iquwheiqwneiuqw neinqwue niqwne uiqnwi nqwpo uneio qnwep 9iqunwie ounqwione ioqwun epoiqwn epoqwn peon qnop",
+//                java.time.LocalDateTime.now(),
+//                2,
+//                new EventLocation( "Movistar Arena", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
+//        );
 
         try {
             UIManager.setLookAndFeel(

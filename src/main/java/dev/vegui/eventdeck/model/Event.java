@@ -1,6 +1,5 @@
 package dev.vegui.eventdeck.model;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -10,14 +9,19 @@ public class Event {
     private String title;
     private String description;
     private LocalDateTime startDate;
-    private Duration duration;
+    private int duration;
     private EventLocation location;
 
     public Event() {
         this.location = new EventLocation();
     }
 
-    public Event(String title, String description, LocalDateTime startDate, Duration duration, EventLocation location) {
+    public Event(UUID id, String title, String description, LocalDateTime startDate, int duration, EventLocation location){
+        this(title, description, startDate, duration, location);
+        this.id = id;
+    }
+
+    public Event(String title, String description, LocalDateTime startDate, int duration, EventLocation location) {
         this.id = UUID.randomUUID();
         this.title = title;
         this.description = description;
@@ -58,11 +62,11 @@ public class Event {
         this.startDate = startDate;
     }
 
-    public Duration getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 

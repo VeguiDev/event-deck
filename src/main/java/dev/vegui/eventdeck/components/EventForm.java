@@ -153,9 +153,7 @@ public class EventForm extends JPanel {
             dateSpinner.setValue(spinnerDate);
         }
 
-        if(event.getDuration() != null) {
-            durationSpinner.setValue(Math.toIntExact(event.getDuration().toHours()));
-        }
+        durationSpinner.setValue(event.getDuration());
 
         EventLocation location = event.getLocation();
 
@@ -188,7 +186,7 @@ public class EventForm extends JPanel {
                 .toLocalDateTime();
 
         event.setStartDate(startDate);
-        event.setDuration(java.time.Duration.ofHours((Integer) durationSpinner.getValue()));
+        event.setDuration((Integer) durationSpinner.getValue());
 
         // Location
         EventLocation location = new EventLocation();
