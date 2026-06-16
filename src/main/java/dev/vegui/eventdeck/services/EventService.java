@@ -39,7 +39,7 @@ public class EventService {
     ) {
         Validators.field("title", title).notEmpty().maxLength(255);
         Validators.field("description", description).notEmpty().maxLength(255);
-        EventLocationService.validateEventLocation(location);
+        this.validateEventLocation(location);
 
         Event event = new Event(title, description, startDate, duration, location);
         eventRepository.save(event);
@@ -58,5 +58,15 @@ public class EventService {
 
     public void delete(UUID id) {
         eventRepository.delete(id);
+    }
+
+    public void validateEventLocation(
+            EventLocation location
+    ) {
+        Validators.field("venueName", location.getVenueName()).notEmpty().maxLength(255);
+        Validators.field("country", location.getCountry()).notEmpty().maxLength(255);
+        Validators.field("province", location.getProvince()).notEmpty().maxLength(255);
+        Validators.field("city", location.getCity()).notEmpty().maxLength(255);
+        Validators.field("street", location.getStreet()).notEmpty().maxLength(255);
     }
 }
