@@ -4,17 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.JarURLConnection;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class DatabaseMigrations {
 
@@ -22,6 +17,7 @@ public class DatabaseMigrations {
 
     private static final Migration[] MIGRATIONS = {
             new Migration(1, "db/migrations/v000-base-entities.sql"),
+            new Migration(2, "db/migrations/v001-ticket-entity.sql"),
     };
 
     public record Migration(int version, String path) {
@@ -32,11 +28,11 @@ public class DatabaseMigrations {
     ) throws SQLException {
 
         c.prepareStatement(
-            """
-            CREATE TABLE IF NOT EXISTS migrations (
-                version INTEGER PRIMARY KEY
-            )
-            """
+                """
+                        CREATE TABLE IF NOT EXISTS migrations (
+                            version INTEGER PRIMARY KEY
+                        )
+                        """
         ).execute();
 
     }
@@ -44,14 +40,14 @@ public class DatabaseMigrations {
     public static List<Integer> getMigratedVersions(Connection connection) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 """
-                SELECT version FROM migrations
-                """
+                        SELECT version FROM migrations
+                        """
         );
 
         List<Integer> versions = new ArrayList<>();
 
         try (ResultSet resultSet = statement.executeQuery()) {
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 versions.add(resultSet.getInt("version"));
             }
         }
@@ -65,7 +61,7 @@ public class DatabaseMigrations {
 
         try (
                 PreparedStatement statement = connection.prepareStatement(sql)
-                ) {
+        ) {
             statement.setInt(1, migration.version);
             statement.execute();
         }
@@ -77,9 +73,9 @@ public class DatabaseMigrations {
 
         List<Integer> migrated = getMigratedVersions(connection);
 
-        for(Migration migration : MIGRATIONS) {
+        for (Migration migration : MIGRATIONS) {
 
-            if(migrated.contains(migration.version)) continue;
+            if (migrated.contains(migration.version)) continue;
 
             connection.prepareStatement(getMigrationStatement(migration)).execute();
 
@@ -100,7 +96,7 @@ public class DatabaseMigrations {
                 statement.append(line).append("\n");
             }
             return statement.toString();
-        }  catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

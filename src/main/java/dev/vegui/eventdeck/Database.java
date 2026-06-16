@@ -22,9 +22,5 @@ public class Database {
         return connection;
     }
 
-    public static void initialize(Connection connection) throws SQLException {
-
-    }
-
 
 }
