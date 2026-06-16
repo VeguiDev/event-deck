@@ -1,8 +1,6 @@
 package dev.vegui.eventdeck;
 
-import dev.vegui.eventdeck.model.EventLocation;
 import dev.vegui.eventdeck.repository.EventRepository;
-import dev.vegui.eventdeck.repository.InMemoryEventRepository;
 import dev.vegui.eventdeck.repository.SQLiteEventRepository;
 import dev.vegui.eventdeck.services.EventService;
 import dev.vegui.eventdeck.views.EventCreateView;
