@@ -48,7 +48,7 @@ public class EventService {
     public void update(Event event) {
         Validators.field("title", event.getTitle()).notEmpty().maxLength(255);
         Validators.field("description", event.getDescription()).notEmpty().maxLength(255);
-        EventLocationService.validateEventLocation(event.getLocation());
+        validateEventLocation(event.getLocation());
         eventRepository.save(event);
     }
 

@@ -36,8 +36,22 @@ public class TicketService {
         return ticketRepo.findById(id);
     }
 
+    private String generateValidCode(int tries) {
+
+        if (tries >= 15) {
+            throw new RuntimeException("Too many tries to generate a valid code");
+        }
+
+        String code = Ticket.generateAccessCode();
+
+        if (findByCode(code) == null) {
+            return code;
+        }
+
+        return generateValidCode(tries++);
+    }
+
     public Ticket create(
-            String code,
             String attendeeName,
             String attendeeEmail,
             Event event
@@ -45,7 +59,7 @@ public class TicketService {
         UUID id = UUID.randomUUID();
         Ticket ticket = new Ticket(
                 id,
-                code,
+                generateValidCode(0),
                 attendeeName,
                 attendeeEmail,
                 event
