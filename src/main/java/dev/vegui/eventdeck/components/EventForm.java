@@ -35,7 +35,6 @@ public class EventForm extends JPanel {
     private JTextField street;
 
     private JButton submitButton;
-    private JButton deleteButton;
 
     public EventForm(EventService eventService, Event event) {
         this.eventService = eventService;
@@ -46,8 +45,8 @@ public class EventForm extends JPanel {
     }
 
     public EventForm(EventService eventService) {
-            this.eventService = eventService;
-            setupForm();
+        this.eventService = eventService;
+        setupForm();
     }
 
     private void setupForm() {
@@ -104,13 +103,7 @@ public class EventForm extends JPanel {
         submitButton = new JButton("Confirmar");
         submitButton.addActionListener(this::onSubmit);
 
-        deleteButton = new JButton("Eliminar");
-        deleteButton.addActionListener(this::onDelete);
-
         actions.add(submitButton);
-        if(this.isEditMode) {
-            actions.add(deleteButton);
-        }
         addWrapper(actions);
     }
 
@@ -143,7 +136,7 @@ public class EventForm extends JPanel {
 
         LocalDateTime startDate = event.getStartDate();
 
-        if(startDate != null) {
+        if (startDate != null) {
             Date spinnerDate = Date.from(
                     startDate
                             .atZone(ZoneId.systemDefault())
@@ -157,7 +150,7 @@ public class EventForm extends JPanel {
 
         EventLocation location = event.getLocation();
 
-        if(location == null) {
+        if (location == null) {
             location = new EventLocation();
         }
 
@@ -198,7 +191,7 @@ public class EventForm extends JPanel {
         event.setLocation(location);
 
         try {
-            if(isEditMode) {
+            if (isEditMode) {
                 this.eventService.update(
                         event
                 );
@@ -224,25 +217,6 @@ public class EventForm extends JPanel {
                     JOptionPane.ERROR_MESSAGE
             );
 
-        }
-
-    }
-
-    private void onDelete(ActionEvent e) {
-
-        if(event == null) return;
-
-        int option = JOptionPane.showConfirmDialog(
-                this,
-                "Estás seguro de que quieres eliminar este evento?",
-                "Confirmar eliminación",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if(option == JOptionPane.YES_OPTION) {
-            this.eventService.delete(this.event);
-
-            Main.getState().getRouter().navigate(Routes.EVENTS_LIST);
         }
 
     }
