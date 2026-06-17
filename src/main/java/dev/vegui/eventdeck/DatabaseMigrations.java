@@ -47,7 +47,8 @@ public class DatabaseMigrations {
         List<Integer> versions = new ArrayList<>();
 
         try (ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
+            while (resultSet.next()) {
+                Main.logger.info("Version " + resultSet.getInt("version"));
                 versions.add(resultSet.getInt("version"));
             }
         }
