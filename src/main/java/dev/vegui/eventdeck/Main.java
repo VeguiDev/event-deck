@@ -5,6 +5,7 @@ import dev.vegui.eventdeck.repository.SQLiteEventRepository;
 import dev.vegui.eventdeck.services.EventService;
 import dev.vegui.eventdeck.views.EventCreateView;
 import dev.vegui.eventdeck.views.EventDetailsView;
+import dev.vegui.eventdeck.views.EventEditView;
 import dev.vegui.eventdeck.views.EventListView;
 
 import javax.swing.*;
@@ -73,9 +74,13 @@ public class Main {
     }
 
     private static void setupRouter(Router router) {
+
+        // Events
         router.register(Routes.EVENTS_LIST, new EventListView());
         router.register(Routes.EVENT_CREATE, new EventCreateView());
         router.register(Routes.EVENT_DETAIL, new EventDetailsView());
+        router.register(Routes.EVENT_EDIT, new EventEditView());
+    
     }
 
     public static MainState getState() {
