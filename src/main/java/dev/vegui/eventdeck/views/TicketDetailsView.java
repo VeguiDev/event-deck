@@ -86,9 +86,7 @@ public class TicketDetailsView extends View {
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
         detailsPanel.setBorder(BorderFactory.createTitledBorder("Resumen"));
         detailsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        detailsPanel.add(new DetailField("Código", valueOrEmpty(ticket.getCode())));
-        detailsPanel.add(Box.createVerticalStrut(detailsGap));
+        
         detailsPanel.add(new DetailField("Nombre del asistente", valueOrEmpty(ticket.getAttendeeName())));
         detailsPanel.add(Box.createVerticalStrut(detailsGap));
         detailsPanel.add(new DetailField("Email del asistente", valueOrEmpty(ticket.getAttendeeEmail())));
