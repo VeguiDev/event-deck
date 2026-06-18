@@ -53,16 +53,10 @@ public class EventDetailsView extends View {
         editButton.addActionListener(e -> {
             getMainState().getRouter().navigate(Routes.EVENT_EDIT);
         });
-        JButton createTicketButton = new JButton("Crear ticket");
-        createTicketButton.addActionListener(e -> {
-            getMainState().setCurrentTicket(null);
-            getMainState().getRouter().navigate(Routes.TICKET_CREATE);
-        });
         JButton deleteButton = new JButton("Borrar");
         deleteButton.addActionListener(this::onDelete);
 
         rightNav.add(editButton);
-        rightNav.add(createTicketButton);
         rightNav.add(deleteButton);
 
         navPanel.add(leftNav, BorderLayout.WEST);
@@ -72,7 +66,11 @@ public class EventDetailsView extends View {
         wrapperPanel = new JPanel();
         wrapperPanel.setLayout(new BoxLayout(wrapperPanel, BoxLayout.Y_AXIS));
         wrapperPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(wrapperPanel, BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        add(scrollPane, BorderLayout.CENTER);
         reload();
     }
 
@@ -150,11 +148,19 @@ public class EventDetailsView extends View {
     private JPanel buildTicketsPanel() {
         JPanel ticketsPanel = new JPanel();
         ticketsPanel.setLayout(new BoxLayout(ticketsPanel, BoxLayout.Y_AXIS));
-        ticketsPanel.setBorder(BorderFactory.createTitledBorder("Tickets"));
         ticketsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel ticketsLabel = new JLabel("Tickets");
+        ticketsLabel.setFont(
+                ticketsLabel.getFont().deriveFont(Font.BOLD, 18f)
+        );
+        ticketsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ticketsPanel.add(ticketsLabel);
+        ticketsPanel.add(Box.createVerticalStrut(8));
 
         if (tickets.isEmpty()) {
             ticketsPanel.add(new JLabel("No hay tickets creados"));
+            ticketsPanel.add(buildTicketActionsPanel(null));
             ticketsPanel.setMaximumSize(new Dimension(
                     Integer.MAX_VALUE,
                     ticketsPanel.getPreferredSize().height
@@ -187,6 +193,30 @@ public class EventDetailsView extends View {
         scrollPane.setPreferredSize(new Dimension(700, 180));
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         ticketsPanel.add(scrollPane);
+        ticketsPanel.add(buildTicketActionsPanel(ticketsTable));
+
+        ticketsPanel.setMaximumSize(new Dimension(
+                Integer.MAX_VALUE,
+                ticketsPanel.getPreferredSize().height
+        ));
+
+        return ticketsPanel;
+    }
+
+    private JPanel buildTicketActionsPanel(JTable ticketsTable) {
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        actions.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JButton createTicketButton = new JButton("Crear ticket");
+        createTicketButton.addActionListener(e -> {
+            getMainState().setCurrentTicket(null);
+            getMainState().getRouter().navigate(Routes.TICKET_CREATE);
+        });
+        actions.add(createTicketButton);
+
+        if (ticketsTable == null) {
+            return actions;
+        }
 
         JButton detailsTicketButton = new JButton("Ver detalle");
         detailsTicketButton.addActionListener(e -> {
@@ -208,18 +238,9 @@ public class EventDetailsView extends View {
             getMainState().setCurrentTicket(selectedTicket);
             getMainState().getRouter().navigate(Routes.TICKET_DETAIL);
         });
-
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        actions.setAlignmentX(Component.LEFT_ALIGNMENT);
         actions.add(detailsTicketButton);
-        ticketsPanel.add(actions);
 
-        ticketsPanel.setMaximumSize(new Dimension(
-                Integer.MAX_VALUE,
-                ticketsPanel.getPreferredSize().height
-        ));
-
-        return ticketsPanel;
+        return actions;
     }
 
     private String getTicketStatus(Ticket ticket) {
