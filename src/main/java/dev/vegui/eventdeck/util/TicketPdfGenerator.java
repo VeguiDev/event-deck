@@ -4,6 +4,8 @@ import com.lowagie.text.Document;
 import com.lowagie.text.Image;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
+import dev.vegui.eventdeck.model.Event;
+import dev.vegui.eventdeck.model.Ticket;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,7 +14,7 @@ import java.io.FileOutputStream;
 
 public class TicketPdfGenerator {
 
-    public static void generate(String path, String eventTitle, String attendeeName, String code) {
+    public static void generate(String path, Event event, Ticket ticket) {
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(path));
@@ -20,12 +22,13 @@ public class TicketPdfGenerator {
             document.open();
 
             document.add(new Paragraph("Entrada EventDeck"));
-            document.add(new Paragraph("Evento: " + eventTitle));
-            document.add(new Paragraph("Asistente: " + attendeeName));
-            document.add(new Paragraph("Codigo: " + code));
+            document.add(new Paragraph("Evento: " + event.getTitle()));
+            document.add(new Paragraph("Asistente: " + ticket.getAttendeeName()));
+            document.add(new Paragraph("Dirección: " + event.getLocation().getFormattedAddress()));
+            document.add(new Paragraph("Fecha: " + event.getStartDate()));
             document.add(new Paragraph(" "));
 
-            BufferedImage qrImage = QRUtils.generateQR("ticket:" + code, 250);
+            BufferedImage qrImage = QRUtils.generateQR("ticket:" + ticket.getCode(), 250);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(qrImage, "PNG", baos);
@@ -34,6 +37,7 @@ public class TicketPdfGenerator {
             pdfQrImage.scaleToFit(250, 250);
 
             document.add(pdfQrImage);
+            document.add(new Paragraph("Codigo: " + ticket.getCode()));
 
             document.close();
         } catch (Exception e) {
