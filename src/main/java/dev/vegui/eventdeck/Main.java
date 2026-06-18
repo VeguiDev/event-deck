@@ -10,12 +10,18 @@ import dev.vegui.eventdeck.services.TicketService;
 import dev.vegui.eventdeck.views.*;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
 public class Main {
     public static Logger logger = Logger.getLogger("EventDeck");
+    public static final Path APPDATA_PATH = resolveAppDataPath();
+    public static final Path DB_PATH = APPDATA_PATH.resolve("eventdeck.db");
+    public static final Path CONFIG_PATH = APPDATA_PATH.resolve("config.ser");
 
     private static MainFrame mainFrame;
     private static EventRepository eventRepository;
@@ -23,16 +29,21 @@ public class Main {
     private static ServiceProvider serviceProvider;
     private static MainState mainState;
     private static Connection connection;
+    private static AppConfig appConfig;
 
     static void main() {
 
         try {
+            initAppData();
+            appConfig = AppConfig.load(CONFIG_PATH);
+            appConfig.save(CONFIG_PATH);
+
             connection = Database.connect();
 
             DatabaseMigrations.runMigrations(connection);
-        } catch (SQLException e) {
+        } catch (SQLException | IOException | ClassNotFoundException e) {
 
-            logger.severe("Error connecting to database");
+            logger.severe("Error initializing application storage");
             e.printStackTrace();
             System.exit(-1);
         }
@@ -98,9 +109,44 @@ public class Main {
         return eventRepository;
     }
 
+    public static AppConfig getAppConfig() {
+        return appConfig;
+    }
+
+    public static void saveAppConfig() {
+        try {
+            appConfig.save(CONFIG_PATH);
+        } catch (IOException e) {
+            logger.severe("Error saving config: " + e.getMessage());
+        }
+    }
+
     public static <T> T getService(Class<T> serviceClass) {
 
         return serviceProvider.getService(serviceClass);
 
+    }
+
+    private static void initAppData() throws IOException {
+        Files.createDirectories(APPDATA_PATH);
+        migrateLegacyDatabase();
+    }
+
+    private static Path resolveAppDataPath() {
+        String appData = System.getenv("APPDATA");
+
+        if (appData != null && !appData.isBlank()) {
+            return Path.of(appData, "eventdeck");
+        }
+
+        return Path.of(System.getProperty("user.home"), "AppData", "Roaming", "eventdeck");
+    }
+
+    private static void migrateLegacyDatabase() throws IOException {
+        Path legacyDbPath = Path.of("eventdeck.db");
+
+        if (Files.exists(legacyDbPath) && !Files.exists(DB_PATH)) {
+            Files.move(legacyDbPath, DB_PATH);
+        }
     }
 }

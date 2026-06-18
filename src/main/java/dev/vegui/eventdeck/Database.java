@@ -7,13 +7,12 @@ import java.sql.Statement;
 
 public class Database {
 
-    private static final String URL = "jdbc:sqlite:eventdeck.db";
-
     private Database() {
     }
 
     public static Connection connect() throws SQLException {
-        Connection connection = DriverManager.getConnection(URL);
+        String url = "jdbc:sqlite:" + Main.DB_PATH;
+        Connection connection = DriverManager.getConnection(url);
 
         try (Statement statement = connection.createStatement()) {
             statement.execute("PRAGMA foreign_keys = ON");
