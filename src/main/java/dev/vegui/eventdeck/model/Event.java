@@ -1,6 +1,7 @@
 package dev.vegui.eventdeck.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Event {
@@ -16,7 +17,7 @@ public class Event {
         this.location = new EventLocation();
     }
 
-    public Event(UUID id, String title, String description, LocalDateTime startDate, int duration, EventLocation location){
+    public Event(UUID id, String title, String description, LocalDateTime startDate, int duration, EventLocation location) {
         this(title, description, startDate, duration, location);
         this.id = id;
     }
@@ -68,6 +69,19 @@ public class Event {
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public String getFormattedStartDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return startDate.format(formatter);
+    }
+
+    public boolean wasStarted() {
+        return startDate.isBefore(LocalDateTime.now());
+    }
+
+    public boolean wasEnded() {
+        return startDate.plusHours(duration).isBefore(LocalDateTime.now());
     }
 
     public EventLocation getLocation() {
