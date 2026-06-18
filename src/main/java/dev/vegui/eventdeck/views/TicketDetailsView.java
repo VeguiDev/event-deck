@@ -7,10 +7,12 @@ import dev.vegui.eventdeck.components.DetailField;
 import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.services.TicketService;
+import dev.vegui.eventdeck.util.QRUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -78,6 +80,7 @@ public class TicketDetailsView extends View {
         invalidateButton.setEnabled(ticket.getDeletedAt() == null);
 
         final int detailsGap = 20;
+        JPanel splitPanel = new JPanel(new GridLayout(0, 2, 16, 0));
 
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
@@ -115,7 +118,24 @@ public class TicketDetailsView extends View {
                 detailsPanel.getPreferredSize().height
         ));
 
-        wrapperPanel.add(detailsPanel);
+        splitPanel.add(detailsPanel);
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setOpaque(false);
+        rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+
+        BufferedImage qr = QRUtils.generateQR("ticket:" + ticket.getCode(), 120);
+        JLabel qrLabel = new JLabel(new ImageIcon(qr));
+        JLabel codeLabel = new JLabel(ticket.getCode());
+        codeLabel.setFont(codeLabel.getFont().deriveFont(Font.BOLD, 18));
+        rightPanel.add(qrLabel);
+        rightPanel.add(codeLabel);
+
+        splitPanel.add(rightPanel);
+
+        wrapperPanel.add(splitPanel);
         wrapperPanel.revalidate();
         wrapperPanel.repaint();
     }
