@@ -82,6 +82,15 @@ public class TicketService {
         ticketRepo.save(ticket);
     }
 
+    public void claim(Ticket ticket) {
+        if (ticket.getDeletedAt() != null || ticket.getAttendedAt() != null) {
+            return;
+        }
+
+        ticket.setAttendedAt(LocalDateTime.now());
+        ticketRepo.save(ticket);
+    }
+
     public void softDelete(Ticket ticket) {
 
         if (ticket.getDeletedAt() != null) {

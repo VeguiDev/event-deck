@@ -1,9 +1,15 @@
 package dev.vegui.eventdeck.util;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
 import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.Result;
 import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
@@ -32,5 +38,12 @@ public class QRUtils {
         } catch (WriterException e) {
             throw new RuntimeException("No se pudo generar el QR", e);
         }
+    }
+
+    public static String readQR(BufferedImage image) throws NotFoundException {
+        BufferedImageLuminanceSource source = new BufferedImageLuminanceSource(image);
+        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+        Result result = new MultiFormatReader().decode(bitmap);
+        return result.getText();
     }
 }

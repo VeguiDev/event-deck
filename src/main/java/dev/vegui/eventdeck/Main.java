@@ -14,6 +14,7 @@ import dev.vegui.eventdeck.views.EventListView;
 import dev.vegui.eventdeck.views.TicketCreateView;
 import dev.vegui.eventdeck.views.TicketDetailsView;
 import dev.vegui.eventdeck.views.TicketEditView;
+import dev.vegui.eventdeck.views.TicketClaimView;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -78,6 +79,7 @@ public class Main {
         router.register(Routes.TICKET_CREATE, new TicketCreateView());
         router.register(Routes.TICKET_DETAIL, new TicketDetailsView());
         router.register(Routes.TICKET_EDIT, new TicketEditView());
+        router.register(Routes.TICKET_USE, new TicketClaimView());
 
     }
 

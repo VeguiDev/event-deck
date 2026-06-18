@@ -80,7 +80,9 @@ public class TicketDetailsView extends View {
         invalidateButton.setEnabled(ticket.getDeletedAt() == null);
 
         final int detailsGap = 20;
-        JPanel splitPanel = new JPanel(new GridLayout(0, 2, 16, 0));
+        JPanel contentPanel = new JPanel(new BorderLayout(24, 0));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
@@ -116,24 +118,32 @@ public class TicketDetailsView extends View {
                 detailsPanel.getPreferredSize().height
         ));
 
-        splitPanel.add(detailsPanel);
+        contentPanel.add(detailsPanel, BorderLayout.CENTER);
 
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setOpaque(false);
+        rightPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Acceso"),
+                BorderFactory.createEmptyBorder(14, 18, 18, 18)
+        ));
         rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
 
-        BufferedImage qr = QRUtils.generateQR("ticket:" + ticket.getCode(), 120);
+        BufferedImage qr = QRUtils.generateQR("ticket:" + ticket.getCode(), 180);
         JLabel qrLabel = new JLabel(new ImageIcon(qr));
+        qrLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JLabel codeLabel = new JLabel(ticket.getCode());
-        codeLabel.setFont(codeLabel.getFont().deriveFont(Font.BOLD, 18));
+        codeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        codeLabel.setFont(codeLabel.getFont().deriveFont(Font.BOLD, 20));
+
         rightPanel.add(qrLabel);
+        rightPanel.add(Box.createVerticalStrut(10));
         rightPanel.add(codeLabel);
+        rightPanel.setPreferredSize(new Dimension(260, rightPanel.getPreferredSize().height));
 
-        splitPanel.add(rightPanel);
+        contentPanel.add(rightPanel, BorderLayout.EAST);
 
-        wrapperPanel.add(splitPanel);
+        wrapperPanel.add(contentPanel);
         wrapperPanel.revalidate();
         wrapperPanel.repaint();
     }

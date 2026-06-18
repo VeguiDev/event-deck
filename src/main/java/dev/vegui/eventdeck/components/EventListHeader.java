@@ -19,14 +19,24 @@ public class EventListHeader extends JPanel {
         label.setFont(
                 label.getFont().deriveFont(Font.BOLD, 18f)
         );
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton claimButton = new JButton("Claim ticket");
         JButton button = new JButton("Crear");
 
+        claimButton.addActionListener((e) -> {
+            Main.getState().setCurrentEvent(null);
+            Main.getState().setCurrentTicket(null);
+            Main.getState().getRouter().navigate(Routes.TICKET_USE);
+        });
         button.addActionListener((e) ->{
             Main.getState().getRouter().navigate(Routes.EVENT_CREATE);
         });
 
+        actions.add(claimButton);
+        actions.add(button);
+
         add(label, BorderLayout.WEST);
-        add(button,  BorderLayout.EAST);
+        add(actions,  BorderLayout.EAST);
 
 
     }

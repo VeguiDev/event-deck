@@ -61,6 +61,11 @@ public class TicketEditView extends View {
     }
 
     private void navigateBack() {
+        if (getMainState().getCurrentTicket() != null) {
+            getMainState().getRouter().navigate(Routes.TICKET_DETAIL);
+            return;
+        }
+
         if (getMainState().getCurrentEvent() == null) {
             getMainState().getRouter().navigate(Routes.EVENTS_LIST);
             return;

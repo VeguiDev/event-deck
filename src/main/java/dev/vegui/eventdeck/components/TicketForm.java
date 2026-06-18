@@ -101,7 +101,7 @@ public class TicketForm extends JPanel {
                 }
 
                 ticketService.update(ticket);
-                Main.getState().getRouter().navigate(Routes.EVENT_DETAIL);
+                Main.getState().getRouter().navigate(Routes.TICKET_DETAIL);
                 return;
             }
 
