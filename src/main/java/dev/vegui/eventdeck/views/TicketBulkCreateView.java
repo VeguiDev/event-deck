@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TicketBulkCreateView extends View {
 
@@ -34,6 +35,8 @@ public class TicketBulkCreateView extends View {
 
     private JFileChooser csvFileChooser;
     private JButton createButton;
+
+    private AtomicBoolean loading = new AtomicBoolean(false);
 
     public TicketBulkCreateView() {
         this.ticketService = Main.getService(TicketService.class);
@@ -160,83 +163,91 @@ public class TicketBulkCreateView extends View {
 
     private void onCreate(ActionEvent e) {
 
-        File file = csvFileChooser.getSelectedFile();
+        try {
+            this.loading.set(true);
+            refreshButtonStatus();
 
-        if (!file.exists() || file == null) {
+            File file = csvFileChooser.getSelectedFile();
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El archivo no existe o no fue seleccionado correctamente.",
-                    "Archivo Inexistente",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            if (!file.exists() || file == null) {
 
-        }
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El archivo no existe o no fue seleccionado correctamente.",
+                        "Archivo Inexistente",
+                        JOptionPane.ERROR_MESSAGE
+                );
 
-        final int nameIndex = (int) nameColumn.getValue();
-        final int emailIndex = (int) emailColumn.getValue();
-
-        Path filePath = file.toPath();
-        List<String[]> tickets = new ArrayList<>();
-
-        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-            String line;
-
-            int index = 0;
-
-            while ((line = reader.readLine()) != null) {
-
-                if (index == 0 && ignoreFristRowCheckBox.isSelected()) {
-                    index++;
-                    continue;
-                }
-
-                String[] fields = line.split(",");
-
-                String nombre = fields[nameIndex - 1];
-                String email = fields[emailIndex - 1];
-
-                Validators.field("Nombre fila #" + index + 1, nombre).personName().maxLength(56).notEmpty();
-                Validators.field("Email fila #" + index + 1, email).email().maxLength(120).notEmpty();
-
-                String[] ticket = {
-                        nombre,
-                        email
-                };
-
-                tickets.add(ticket);
-
-                index++;
             }
 
-        } catch (IOException ex) {
+            final int nameIndex = (int) nameColumn.getValue();
+            final int emailIndex = (int) emailColumn.getValue();
+
+            Path filePath = file.toPath();
+            List<String[]> tickets = new ArrayList<>();
+
+            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+                String line;
+
+                int index = 0;
+
+                while ((line = reader.readLine()) != null) {
+
+                    if (index == 0 && ignoreFristRowCheckBox.isSelected()) {
+                        index++;
+                        continue;
+                    }
+
+                    String[] fields = line.split(",");
+
+                    String nombre = fields[nameIndex - 1];
+                    String email = fields[emailIndex - 1];
+
+                    Validators.field("Nombre fila #" + index + 1, nombre).personName().maxLength(56).notEmpty();
+                    Validators.field("Email fila #" + index + 1, email).email().maxLength(120).notEmpty();
+
+                    String[] ticket = {
+                            nombre,
+                            email
+                    };
+
+                    tickets.add(ticket);
+
+                    index++;
+                }
+
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        ex.getMessage(),
+                        "Error de lectura",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+            for (String[] ticket : tickets) {
+
+                ticketService.create(ticket[0], ticket[1], this.event);
+
+            }
+
             JOptionPane.showMessageDialog(
                     this,
-                    ex.getMessage(),
-                    "Error de lectura",
-                    JOptionPane.ERROR_MESSAGE
+                    "Se han creado " + tickets.size() + " tickets de forma exitosa!",
+                    "Creación exitosa",
+                    JOptionPane.INFORMATION_MESSAGE
             );
+
+            Main.getState().getRouter().navigate(Routes.EVENT_DETAIL);
+        } finally {
+            this.loading.set(false);
+            refreshButtonStatus();
         }
-
-        for (String[] ticket : tickets) {
-
-            ticketService.create(ticket[0], ticket[1], this.event);
-
-        }
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Se han creado " + tickets.size() + " tickets de forma exitosa!",
-                "Creación exitosa",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        Main.getState().getRouter().navigate(Routes.EVENT_DETAIL);
 
     }
 
     private void refreshButtonStatus() {
-        createButton.setEnabled(this.csvFileChooser.getSelectedFile() != null);
+        createButton.setEnabled(this.csvFileChooser.getSelectedFile() != null && !this.loading.get());
     }
 
     private void addContent(Component component) {
