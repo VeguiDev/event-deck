@@ -27,7 +27,7 @@ public class TicketService {
     }
 
     public List<Ticket> findByEvent(Event event) {
-        return this.findByEvent(event.getId());
+        return this.findByEvent(event.getId()).stream().peek(t -> t.setEvent(event)).toList();
     }
 
     public List<Ticket> findByEvent(UUID eventId) {

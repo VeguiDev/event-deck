@@ -3,6 +3,7 @@ package dev.vegui.eventdeck.views;
 import dev.vegui.eventdeck.Main;
 import dev.vegui.eventdeck.Routes;
 import dev.vegui.eventdeck.View;
+import dev.vegui.eventdeck.components.AttendenceBar;
 import dev.vegui.eventdeck.components.DetailField;
 import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
@@ -19,6 +20,7 @@ public class EventDetailsView extends View {
     private EventService eventService;
     private TicketService ticketService;
     private Event event;
+    private List<Ticket> tickets;
 
     // Components
     private JPanel navPanel;
@@ -85,6 +87,7 @@ public class EventDetailsView extends View {
         }
 
         this.event = getMainState().getCurrentEvent();
+        this.tickets = ticketService.findByEvent(event);
 
         String titleText = event.getTitle() + " - Detalles";
         title.setText(titleText);
@@ -100,6 +103,9 @@ public class EventDetailsView extends View {
         detailsPanel.add(new DetailField("Titulo", event.getTitle()));
         detailsPanel.add(Box.createVerticalStrut(detailsGap));
         detailsPanel.add(new DetailField("Descripción", event.getDescription()));
+        detailsPanel.add(Box.createVerticalStrut(detailsGap));
+
+        detailsPanel.add(new AttendenceBar(tickets));
         detailsPanel.add(Box.createVerticalStrut(detailsGap));
 
         JPanel shortDetails = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -146,8 +152,6 @@ public class EventDetailsView extends View {
         ticketsPanel.setLayout(new BoxLayout(ticketsPanel, BoxLayout.Y_AXIS));
         ticketsPanel.setBorder(BorderFactory.createTitledBorder("Tickets"));
         ticketsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        List<Ticket> tickets = ticketService.findByEvent(event);
 
         if (tickets.isEmpty()) {
             ticketsPanel.add(new JLabel("No hay tickets creados"));
