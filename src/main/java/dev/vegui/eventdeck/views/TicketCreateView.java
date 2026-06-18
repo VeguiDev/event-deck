@@ -21,6 +21,8 @@ public class TicketCreateView extends View {
 
         setLayout(new BorderLayout());
 
+        JPanel haederPanel = new JPanel(new BorderLayout());
+
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton backButton = new JButton("Volver");
         backButton.addActionListener(e -> navigateBack());
@@ -31,7 +33,19 @@ public class TicketCreateView extends View {
                 title.getFont().deriveFont(Font.BOLD, 18f)
         );
         navPanel.add(title);
-        add(navPanel, BorderLayout.NORTH);
+
+        JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        JButton bulkButton = new JButton("Crear lote");
+        bulkButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        bulkButton.addActionListener(e -> {
+            Main.getState().getRouter().navigate(Routes.TICKET_CREATE_BULK);
+        });
+        actionsPanel.add(bulkButton);
+
+        haederPanel.add(navPanel, BorderLayout.WEST);
+        haederPanel.add(actionsPanel, BorderLayout.EAST);
+        add(haederPanel, BorderLayout.NORTH);
     }
 
     @Override

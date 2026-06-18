@@ -7,14 +7,7 @@ import dev.vegui.eventdeck.repository.TicketRepository;
 import dev.vegui.eventdeck.services.EventService;
 import dev.vegui.eventdeck.services.ServiceProvider;
 import dev.vegui.eventdeck.services.TicketService;
-import dev.vegui.eventdeck.views.EventCreateView;
-import dev.vegui.eventdeck.views.EventDetailsView;
-import dev.vegui.eventdeck.views.EventEditView;
-import dev.vegui.eventdeck.views.EventListView;
-import dev.vegui.eventdeck.views.TicketCreateView;
-import dev.vegui.eventdeck.views.TicketDetailsView;
-import dev.vegui.eventdeck.views.TicketEditView;
-import dev.vegui.eventdeck.views.TicketClaimView;
+import dev.vegui.eventdeck.views.*;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -77,6 +70,7 @@ public class Main {
 
         // Tickets
         router.register(Routes.TICKET_CREATE, new TicketCreateView());
+        router.register(Routes.TICKET_CREATE_BULK, new TicketBulkCreateView());
         router.register(Routes.TICKET_DETAIL, new TicketDetailsView());
         router.register(Routes.TICKET_EDIT, new TicketEditView());
         router.register(Routes.TICKET_USE, new TicketClaimView());
@@ -105,7 +99,7 @@ public class Main {
     }
 
     public static <T> T getService(Class<T> serviceClass) {
-        
+
         return serviceProvider.getService(serviceClass);
 
     }
