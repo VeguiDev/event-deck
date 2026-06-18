@@ -8,7 +8,7 @@ import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.services.TicketService;
 import dev.vegui.eventdeck.util.QRUtils;
-import dev.vegui.eventdeck.util.TicketPdfGenerator;
+import dev.vegui.eventdeck.util.TicketExporter;
 import dev.vegui.eventdeck.util.Util;
 
 import javax.swing.*;
@@ -190,7 +190,7 @@ public class TicketDetailsView extends View {
         File output = new File(folder, "ticket-" + sanitizeFileName(ticket.getCode()) + ".pdf");
 
         try {
-            TicketPdfGenerator.generate(
+            TicketExporter.generate(
                     output.getAbsolutePath(),
                     Main.getState().getCurrentEvent(),
                     ticket

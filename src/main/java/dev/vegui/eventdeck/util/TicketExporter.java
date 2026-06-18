@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 
-public class TicketPdfGenerator {
+public class TicketExporter {
 
     public static void generate(String path, Event event, Ticket ticket) {
         try {
