@@ -6,6 +6,7 @@ public enum Routes {
     EVENT_DETAIL,
     EVENT_CREATE,
     EVENT_EDIT,
+    SETTINGS,
     TICKET_CREATE,
     TICKET_CREATE_BULK,
     TICKET_DETAIL,

@@ -78,6 +78,7 @@ public class Main {
         router.register(Routes.EVENT_CREATE, new EventCreateView());
         router.register(Routes.EVENT_DETAIL, new EventDetailsView());
         router.register(Routes.EVENT_EDIT, new EventEditView());
+        router.register(Routes.SETTINGS, new SettingsView());
 
         // Tickets
         router.register(Routes.TICKET_CREATE, new TicketCreateView());

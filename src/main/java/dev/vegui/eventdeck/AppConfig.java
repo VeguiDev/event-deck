@@ -1,5 +1,6 @@
 package dev.vegui.eventdeck;
 
+import java.io.InvalidClassException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,6 +50,8 @@ public class AppConfig implements Serializable {
 
         try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (AppConfig) input.readObject();
+        } catch (InvalidClassException e) {
+            return new AppConfig();
         }
     }
 
@@ -59,12 +62,14 @@ public class AppConfig implements Serializable {
     }
     
     public record SMTPConfig(
+            boolean enabled,
             String sender,
             String host,
             int port,
             String user,
             String password
     ) implements Serializable {
+        private static final long serialVersionUID = 1L;
     }
 
 }
