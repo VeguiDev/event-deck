@@ -4,6 +4,7 @@ import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.repository.TicketRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,12 +74,15 @@ public class TicketService {
         ticketRepo.save(ticket);
     }
 
-    public void delete(Ticket ticket) {
-        delete(ticket.getId());
-    }
+    public void softDelete(Ticket ticket) {
 
-    public void delete(UUID id) {
-        ticketRepo.delete(id);
+        if (ticket.getDeletedAt() == null) {
+            return;
+        }
+
+        ticket.setDeletedAt(LocalDateTime.now());
+        ticketRepo.save(ticket);
+
     }
 
 }
