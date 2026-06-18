@@ -23,7 +23,7 @@ public class EventDetailsView extends View {
 
     public EventDetailsView() {
 
-        this.eventService = Main.getService();
+        this.eventService = Main.getService(EventService.class);
 
         setLayout(new BorderLayout());
         this.navPanel = new JPanel(new BorderLayout());
@@ -122,15 +122,9 @@ public class EventDetailsView extends View {
                 detailsPanel.getPreferredSize().height
         ));
 
-        wrapperPanel.add(detailsPanel, BorderLayout.CENTER);
+        wrapperPanel.add(detailsPanel);
         wrapperPanel.revalidate();
         wrapperPanel.repaint();
-    }
-
-    @Override
-    public void onHide() {
-        super.onHide();
-        Main.getState().setCurrentEvent(null);
     }
 
     private void onDelete(ActionEvent e) {

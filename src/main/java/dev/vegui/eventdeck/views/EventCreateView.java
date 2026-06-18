@@ -13,7 +13,7 @@ public class EventCreateView extends View {
     private final EventService eventService;
 
     public EventCreateView() {
-        this.eventService = Main.getService();
+        this.eventService = Main.getService(EventService.class);
 
         setLayout(new BorderLayout());
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -28,7 +28,7 @@ public class EventCreateView extends View {
         );
         navPanel.add(label);
         add(navPanel, BorderLayout.NORTH);
-        EventForm form =  new EventForm(this.eventService);
+        EventForm form = new EventForm(this.eventService);
         JScrollPane scrollPane = new JScrollPane(form);
         add(scrollPane, BorderLayout.CENTER);
     }

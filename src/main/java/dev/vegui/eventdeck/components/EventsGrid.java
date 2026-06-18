@@ -16,7 +16,7 @@ public class EventsGrid extends JPanel {
 
     public EventsGrid() {
         this.events = new ArrayList<>();
-        this.eventService = Main.getService();
+        this.eventService = Main.getService(EventService.class);
         setLayout(
                 new GridLayout(0, 3, 16, 16)
         );

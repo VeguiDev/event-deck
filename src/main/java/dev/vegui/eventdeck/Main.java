@@ -2,7 +2,11 @@ package dev.vegui.eventdeck;
 
 import dev.vegui.eventdeck.repository.EventRepository;
 import dev.vegui.eventdeck.repository.SQLiteEventRepository;
+import dev.vegui.eventdeck.repository.SQLiteTicketRepository;
+import dev.vegui.eventdeck.repository.TicketRepository;
 import dev.vegui.eventdeck.services.EventService;
+import dev.vegui.eventdeck.services.ServiceProvider;
+import dev.vegui.eventdeck.services.TicketService;
 import dev.vegui.eventdeck.views.EventCreateView;
 import dev.vegui.eventdeck.views.EventDetailsView;
 import dev.vegui.eventdeck.views.EventEditView;
@@ -18,7 +22,8 @@ public class Main {
 
     private static MainFrame mainFrame;
     private static EventRepository eventRepository;
-    private static EventService service;
+    private static TicketRepository ticketRepository;
+    private static ServiceProvider serviceProvider;
     private static MainState mainState;
     private static Connection connection;
 
@@ -35,24 +40,9 @@ public class Main {
             System.exit(-1);
         }
 
-        eventRepository = new SQLiteEventRepository(connection);
-        service = new EventService(eventRepository);
+        serviceProvider = new ServiceProvider();
 
-//        service.create(
-//                "AGS 2026",
-//                "VISA Argentina Game Show 2026",
-//                java.time.LocalDateTime.now(),
-//                2,
-//                new EventLocation( "Mi kasa", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
-//        );
-//
-//        service.create(
-//                "Tottapalooza 2026",
-//                "Tottapalooza 2026 qwhe8iquwheiqwneiuqw neinqwue niqwne uiqnwi nqwpo uneio qnwep 9iqunwie ounqwione ioqwun epoiqwn epoqwn peon qnop",
-//                java.time.LocalDateTime.now(),
-//                2,
-//                new EventLocation( "Movistar Arena", "Calle 1234", "Ciudad mistica", "Buenos Aires", "Argentina")
-//        );
+        initServices();
 
         try {
             UIManager.setLookAndFeel(
@@ -80,7 +70,16 @@ public class Main {
         router.register(Routes.EVENT_CREATE, new EventCreateView());
         router.register(Routes.EVENT_DETAIL, new EventDetailsView());
         router.register(Routes.EVENT_EDIT, new EventEditView());
-    
+
+    }
+
+    private static void initServices() {
+        eventRepository = new SQLiteEventRepository(connection);
+        ticketRepository = new SQLiteTicketRepository(connection);
+
+        serviceProvider.register(EventService.class, new EventService(eventRepository));
+        serviceProvider.register(TicketService.class, new TicketService(ticketRepository));
+
     }
 
     public static MainState getState() {
@@ -95,7 +94,9 @@ public class Main {
         return eventRepository;
     }
 
-    public static EventService getService() {
-        return service;
+    public static <T> T getService(Class<T> serviceClass) {
+        
+        return serviceProvider.getService(serviceClass);
+
     }
 }

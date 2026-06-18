@@ -20,7 +20,7 @@ public class EventEditView extends View {
 
     public EventEditView() {
 
-        this.eventService = Main.getService();
+        this.eventService = Main.getService(EventService.class);
 
         setLayout(new BorderLayout());
         this.navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
