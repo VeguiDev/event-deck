@@ -1,21 +1,26 @@
 package dev.vegui.eventdeck.services;
 
+import dev.vegui.eventdeck.Main;
 import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.repository.TicketRepository;
+import dev.vegui.eventdeck.util.TicketExporter;
 import dev.vegui.eventdeck.util.Validators;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class TicketService {
 
     private TicketRepository ticketRepo;
+    private final EmailService emailService;
 
     public TicketService(TicketRepository ticketRepo) {
         this.ticketRepo = ticketRepo;
+        this.emailService = Main.getService(EmailService.class);
     }
 
     public List<Ticket> findAll() {
@@ -72,6 +77,11 @@ public class TicketService {
         );
 
         ticketRepo.save(ticket);
+
+        if (Main.getAppConfig().isAutoSendTicket()) {
+            this.notifyViaEmail(ticket, event);
+        }
+
         return ticket;
     }
 
@@ -100,6 +110,29 @@ public class TicketService {
         ticket.setDeletedAt(LocalDateTime.now());
         ticketRepo.save(ticket);
 
+    }
+
+    public void notifyViaEmail(Ticket ticket, Event event) {
+        if (!Main.getAppConfig().getSmtpConfig().enabled()) {
+            Main.logger.log(Level.WARNING, "Email notification has been disabled, ignoring.");
+            return;
+        }
+        
+        try {
+            String plainText = TicketExporter.exportToString(ticket, event);
+            String htmlText = TicketExporter.exportToHTML(ticket, event);
+
+            this.emailService.sendMail(
+                    ticket.getAttendeeEmail(),
+                    "EventDeck: Te han invitado a participar de este evento.",
+                    plainText,
+                    htmlText
+            );
+
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            Main.logger.log(Level.SEVERE, "Error sending email ticket notification", e1);
+        }
     }
 
 }

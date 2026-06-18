@@ -143,11 +143,18 @@ public class TicketDetailsView extends View {
         exportButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         exportButton.addActionListener(this::onExportPdf);
 
+        JButton emailButton = new JButton("Notificar por email");
+        emailButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        emailButton.addActionListener(this::onNotifyViaEmail);
+        emailButton.setEnabled(Main.getAppConfig().getSmtpConfig().enabled());
+
         rightPanel.add(qrLabel);
         rightPanel.add(Box.createVerticalStrut(10));
         rightPanel.add(codeLabel);
         rightPanel.add(Box.createVerticalStrut(14));
         rightPanel.add(exportButton);
+        rightPanel.add(Box.createVerticalStrut(14));
+        rightPanel.add(emailButton);
         rightPanel.setPreferredSize(new Dimension(260, rightPanel.getPreferredSize().height));
 
         contentPanel.add(rightPanel, BorderLayout.EAST);
@@ -171,6 +178,17 @@ public class TicketDetailsView extends View {
             ticketService.softDelete(ticket);
             reload();
         }
+    }
+
+    private void onNotifyViaEmail(ActionEvent e) {
+        Event event = Main.getState().getCurrentEvent();
+
+        if (ticket == null || event == null) return;
+
+        if (!Main.getAppConfig().getSmtpConfig().enabled()) return;
+
+
+        this.ticketService.notifyViaEmail(ticket, event);
     }
 
     private void onExportPdf(ActionEvent e) {
