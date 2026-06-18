@@ -7,7 +7,8 @@ public class EventLocation {
     private String province;
     private String country;
 
-    public EventLocation() {}
+    public EventLocation() {
+    }
 
     public EventLocation(
             String venueName,
@@ -24,7 +25,8 @@ public class EventLocation {
     }
 
     public String getFormattedAddress() {
-        return "%s, %s, %s, %s".formatted(
+        return "%s, %s, %s, %s, %s".formatted(
+                venueName,
                 street,
                 city,
                 province,
