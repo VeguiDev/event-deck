@@ -6,8 +6,6 @@
 <p>Una aplicación de escritorio para gestionar eventos</p>
 </div>
 
----
-
 ### Funciones
 
 En la siguiente lista se enumeran las funciones de EventDeck.
@@ -23,7 +21,8 @@ En la siguiente lista se enumeran las funciones de EventDeck.
 
 ### Resumen de arquitectura
 
-EventDeck es una aplicación de escritorio hecha con Java Swing. Usa SQLite para persistir datos de forma local y se organiza en controladores, servicios y repositorios.
+EventDeck es una aplicación de escritorio hecha con Java Swing. Usa SQLite para persistir datos de forma local y se
+organiza en controladores, servicios y repositorios.
 
 - **Servicios:** ejecutan la lógica de negocio.
 - **Controladores:** son la capa de presentación de la aplicación. Desde aquí el usuario accede a los
@@ -101,7 +100,8 @@ En Windows:
 
 ### Configuración SMTP
 
-La configuración SMTP es opcional y solo hace falta si querés enviar invitaciones por email desde la aplicación. Podés cargar los datos del servidor SMTP desde la pantalla de configuración de EventDeck.
+La configuración SMTP es opcional y solo hace falta si querés enviar invitaciones por email desde la aplicación. Podés
+cargar los datos del servidor SMTP desde la pantalla de configuración de EventDeck.
 
 ---
 
