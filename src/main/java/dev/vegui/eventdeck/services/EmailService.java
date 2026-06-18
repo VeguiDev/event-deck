@@ -47,17 +47,15 @@ public class EmailService {
         buildMailer();
     }
 
-    public void sendMail(String to, String subject, String text, String html, Map<String, byte[]> attachments) {
+    public CompletableFuture<Boolean> sendMail(String to, String subject, String text, String html, Map<String, byte[]> attachments) {
 
-        CompletableFuture.runAsync(() -> {
-            sendMailAsync(to, subject, text, html, attachments);
-        });
+        return CompletableFuture.supplyAsync(() -> sendMailAsync(to, subject, text, html, attachments));
 
     }
 
-    public void sendMailAsync(String to, String subject, String text, String html, Map<String, byte[]> attachments) {
+    public boolean sendMailAsync(String to, String subject, String text, String html, Map<String, byte[]> attachments) {
 
-        if (!Main.getAppConfig().getSmtpConfig().enabled()) return;
+        if (!Main.getAppConfig().getSmtpConfig().enabled()) return false;
 
         if (mailer == null) {
             buildMailer();
@@ -79,8 +77,14 @@ public class EmailService {
             }
         }
 
-        this.mailer.sendMail(builder.buildEmail());
+        try {
+            this.mailer.sendMail(builder.buildEmail());
+        } catch (Exception ex1) {
+            Main.logger.log(Level.WARNING, "Error al enviar el mail", ex1);
+            return false;
+        }
 
+        return true;
     }
 
 }

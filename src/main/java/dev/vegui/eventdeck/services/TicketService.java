@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class TicketService {
@@ -117,10 +118,10 @@ public class TicketService {
 
     }
 
-    public void notifyViaEmail(Ticket ticket, Event event) {
+    public CompletableFuture<Boolean> notifyViaEmail(Ticket ticket, Event event) {
         if (!Main.getAppConfig().getSmtpConfig().enabled()) {
             Main.logger.log(Level.WARNING, "Email notification has been disabled, ignoring.");
-            return;
+            return CompletableFuture.completedFuture(false);
         }
 
         try {
@@ -134,7 +135,7 @@ public class TicketService {
 
             byte[] qrBytes = output.toByteArray();
 
-            this.emailService.sendMail(
+            return this.emailService.sendMail(
                     ticket.getAttendeeEmail(),
                     "EventDeck: Te han invitado a participar de este evento.",
                     plainText,
@@ -149,6 +150,8 @@ public class TicketService {
             e1.printStackTrace();
             Main.logger.log(Level.SEVERE, "Error sending email ticket notification", e1);
         }
+
+        return CompletableFuture.completedFuture(false);
     }
 
 }

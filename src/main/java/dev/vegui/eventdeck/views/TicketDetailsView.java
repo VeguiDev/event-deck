@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TicketDetailsView extends View {
     private final TicketService ticketService;
@@ -26,6 +27,9 @@ public class TicketDetailsView extends View {
     private JLabel title;
     private JPanel wrapperPanel;
     private JButton invalidateButton;
+    private JButton emailButton;
+
+    private AtomicBoolean sending = new AtomicBoolean(false);
 
     public TicketDetailsView() {
         this.ticketService = Main.getService(TicketService.class);
@@ -143,10 +147,10 @@ public class TicketDetailsView extends View {
         exportButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         exportButton.addActionListener(this::onExportPdf);
 
-        JButton emailButton = new JButton("Notificar por email");
+        emailButton = new JButton("Notificar por email");
         emailButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         emailButton.addActionListener(this::onNotifyViaEmail);
-        emailButton.setEnabled(Main.getAppConfig().getSmtpConfig().enabled());
+        refreshEmailButton();
 
         rightPanel.add(qrLabel);
         rightPanel.add(Box.createVerticalStrut(10));
@@ -162,6 +166,10 @@ public class TicketDetailsView extends View {
         wrapperPanel.add(contentPanel);
         wrapperPanel.revalidate();
         wrapperPanel.repaint();
+    }
+
+    public void refreshEmailButton() {
+        emailButton.setEnabled(Main.getAppConfig().getSmtpConfig().enabled() && !this.sending.get());
     }
 
     private void onInvalidate(ActionEvent e) {
@@ -181,6 +189,8 @@ public class TicketDetailsView extends View {
     }
 
     private void onNotifyViaEmail(ActionEvent e) {
+        this.sending.set(true);
+        refreshEmailButton();
         Event event = Main.getState().getCurrentEvent();
 
         if (ticket == null || event == null) return;
@@ -188,7 +198,26 @@ public class TicketDetailsView extends View {
         if (!Main.getAppConfig().getSmtpConfig().enabled()) return;
 
 
-        this.ticketService.notifyViaEmail(ticket, event);
+        this.ticketService.notifyViaEmail(ticket, event).thenAccept(status -> {
+            sending.set(false);
+            refreshEmailButton();
+
+            if (status) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Notificación enviada con exito",
+                        "Notificación Enviada",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ha ocurrido un error al enviar el correo electronico",
+                        "Error al enviar notificación",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
     }
 
     private void onExportPdf(ActionEvent e) {
