@@ -4,6 +4,7 @@ import dev.vegui.eventdeck.repository.EventRepository;
 import dev.vegui.eventdeck.repository.SQLiteEventRepository;
 import dev.vegui.eventdeck.repository.SQLiteTicketRepository;
 import dev.vegui.eventdeck.repository.TicketRepository;
+import dev.vegui.eventdeck.services.EmailService;
 import dev.vegui.eventdeck.services.EventService;
 import dev.vegui.eventdeck.services.ServiceProvider;
 import dev.vegui.eventdeck.services.TicketService;
@@ -93,6 +94,7 @@ public class Main {
         eventRepository = new SQLiteEventRepository(connection);
         ticketRepository = new SQLiteTicketRepository(connection);
 
+        serviceProvider.register(EmailService.class, new EmailService());
         serviceProvider.register(EventService.class, new EventService(eventRepository));
         serviceProvider.register(TicketService.class, new TicketService(ticketRepository));
 
@@ -117,6 +119,11 @@ public class Main {
     public static void saveAppConfig() {
         try {
             appConfig.save(CONFIG_PATH);
+            EmailService serv = serviceProvider.getService(EmailService.class);
+
+            if (serv != null) {
+                serv.reload();
+            }
         } catch (IOException e) {
             logger.severe("Error saving config: " + e.getMessage());
         }
