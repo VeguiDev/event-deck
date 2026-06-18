@@ -84,7 +84,7 @@ public class TicketService {
 
     public void softDelete(Ticket ticket) {
 
-        if (ticket.getDeletedAt() == null) {
+        if (ticket.getDeletedAt() != null) {
             return;
         }
 

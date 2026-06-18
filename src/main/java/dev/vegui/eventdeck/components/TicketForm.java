@@ -53,6 +53,8 @@ public class TicketForm extends JPanel {
         if (isEditMode) {
             addWrapper(new JLabel("Código"));
             code = new JTextField(20);
+            code.setEditable(false);
+            code.setFocusable(false);
             addWrapper(code);
         }
 
@@ -90,7 +92,6 @@ public class TicketForm extends JPanel {
     private void onSubmit() {
         try {
             if (isEditMode) {
-                ticket.setCode(code.getText());
                 ticket.setAttendeeName(attendeeName.getText());
                 ticket.setAttendeeEmail(attendeeEmail.getText());
 

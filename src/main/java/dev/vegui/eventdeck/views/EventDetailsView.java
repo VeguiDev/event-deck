@@ -10,6 +10,7 @@ import dev.vegui.eventdeck.services.EventService;
 import dev.vegui.eventdeck.services.TicketService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -150,30 +151,64 @@ public class EventDetailsView extends View {
 
         if (tickets.isEmpty()) {
             ticketsPanel.add(new JLabel("No hay tickets creados"));
+            ticketsPanel.setMaximumSize(new Dimension(
+                    Integer.MAX_VALUE,
+                    ticketsPanel.getPreferredSize().height
+            ));
+            return ticketsPanel;
         }
+
+        String[] columnNames = {"Código", "Nombre", "Email", "Estado"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         for (Ticket ticket : tickets) {
-            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            row.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            row.add(new JLabel(ticket.getCode()));
-            row.add(Box.createHorizontalStrut(12));
-            row.add(new JLabel(ticket.getAttendeeName()));
-            row.add(Box.createHorizontalStrut(12));
-            row.add(new JLabel(ticket.getAttendeeEmail()));
-            row.add(Box.createHorizontalStrut(12));
-            row.add(new JLabel(getTicketStatus(ticket)));
-
-            JButton editTicketButton = new JButton("Editar");
-            editTicketButton.addActionListener(e -> {
-                ticket.setEvent(event);
-                getMainState().setCurrentTicket(ticket);
-                getMainState().getRouter().navigate(Routes.TICKET_EDIT);
+            model.addRow(new Object[]{
+                    ticket.getCode(),
+                    ticket.getAttendeeName(),
+                    ticket.getAttendeeEmail(),
+                    getTicketStatus(ticket)
             });
-            row.add(editTicketButton);
-
-            ticketsPanel.add(row);
         }
+
+        JTable ticketsTable = new JTable(model);
+        ticketsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ticketsTable.getTableHeader().setReorderingAllowed(false);
+
+        JScrollPane scrollPane = new JScrollPane(ticketsTable);
+        scrollPane.setPreferredSize(new Dimension(700, 180));
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ticketsPanel.add(scrollPane);
+
+        JButton detailsTicketButton = new JButton("Ver detalle");
+        detailsTicketButton.addActionListener(e -> {
+            int selectedRow = ticketsTable.getSelectedRow();
+
+            if (selectedRow < 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Seleccioná un ticket para ver el detalle",
+                        "Ticket no seleccionado",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            int modelRow = ticketsTable.convertRowIndexToModel(selectedRow);
+            Ticket selectedTicket = tickets.get(modelRow);
+            selectedTicket.setEvent(event);
+            getMainState().setCurrentTicket(selectedTicket);
+            getMainState().getRouter().navigate(Routes.TICKET_DETAIL);
+        });
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        actions.setAlignmentX(Component.LEFT_ALIGNMENT);
+        actions.add(detailsTicketButton);
+        ticketsPanel.add(actions);
 
         ticketsPanel.setMaximumSize(new Dimension(
                 Integer.MAX_VALUE,
