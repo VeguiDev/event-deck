@@ -51,10 +51,12 @@ public class SQLiteTicketRepository implements TicketRepository {
             stat.setString(3, ticket.getAttendeeName());
             stat.setString(4, ticket.getAttendeeEmail());
 
-            if (ticket.getEvent() == null) {
-                stat.setString(5, null);
-            } else {
+            if (ticket.getEvent() != null) {
                 stat.setString(5, ticket.getEvent().getId().toString());
+            } else if (ticket.getEventId() != null) {
+                stat.setString(5, ticket.getEventId().toString());
+            } else {
+                stat.setString(5, null);
             }
 
             stat.setString(6, ticket.getCreatedAt().toString());
@@ -149,12 +151,15 @@ public class SQLiteTicketRepository implements TicketRepository {
         List<Ticket> tickets = new ArrayList<>();
 
         try (
-                PreparedStatement stat = connection.prepareStatement(sql);
-                ResultSet rs = stat.executeQuery()
+                PreparedStatement stat = connection.prepareStatement(sql)
         ) {
-            while (rs.next()) {
-                Ticket ticket = this.parseTicket(rs);
-                tickets.add(ticket);
+            stat.setString(1, event_id.toString());
+
+            try (ResultSet rs = stat.executeQuery()) {
+                while (rs.next()) {
+                    Ticket ticket = this.parseTicket(rs);
+                    tickets.add(ticket);
+                }
             }
         } catch (SQLException ex) {
             Main.logger.severe("Error find ticket by event: " + ex.getMessage());

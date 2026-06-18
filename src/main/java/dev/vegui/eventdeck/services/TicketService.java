@@ -3,6 +3,7 @@ package dev.vegui.eventdeck.services;
 import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.repository.TicketRepository;
+import dev.vegui.eventdeck.util.Validators;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,11 +46,11 @@ public class TicketService {
 
         String code = Ticket.generateAccessCode();
 
-        if (findByCode(code) == null) {
+        if (findByCode(code).isEmpty()) {
             return code;
         }
 
-        return generateValidCode(tries++);
+        return generateValidCode(tries + 1);
     }
 
     public Ticket create(
@@ -57,6 +58,10 @@ public class TicketService {
             String attendeeEmail,
             Event event
     ) {
+        Validators.field("attendeeName", attendeeName).notEmpty().maxLength(255);
+        Validators.field("attendeeEmail", attendeeEmail).notEmpty().maxLength(255);
+        Validators.field("event", event).notEmpty();
+
         UUID id = UUID.randomUUID();
         Ticket ticket = new Ticket(
                 id,
@@ -71,6 +76,9 @@ public class TicketService {
     }
 
     public void update(Ticket ticket) {
+        Validators.field("code", ticket.getCode()).notEmpty().maxLength(255);
+        Validators.field("attendeeName", ticket.getAttendeeName()).notEmpty().maxLength(255);
+        Validators.field("attendeeEmail", ticket.getAttendeeEmail()).notEmpty().maxLength(255);
         ticketRepo.save(ticket);
     }
 

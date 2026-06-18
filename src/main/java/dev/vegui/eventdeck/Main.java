@@ -11,6 +11,8 @@ import dev.vegui.eventdeck.views.EventCreateView;
 import dev.vegui.eventdeck.views.EventDetailsView;
 import dev.vegui.eventdeck.views.EventEditView;
 import dev.vegui.eventdeck.views.EventListView;
+import dev.vegui.eventdeck.views.TicketCreateView;
+import dev.vegui.eventdeck.views.TicketEditView;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -70,6 +72,10 @@ public class Main {
         router.register(Routes.EVENT_CREATE, new EventCreateView());
         router.register(Routes.EVENT_DETAIL, new EventDetailsView());
         router.register(Routes.EVENT_EDIT, new EventEditView());
+
+        // Tickets
+        router.register(Routes.TICKET_CREATE, new TicketCreateView());
+        router.register(Routes.TICKET_EDIT, new TicketEditView());
 
     }
 

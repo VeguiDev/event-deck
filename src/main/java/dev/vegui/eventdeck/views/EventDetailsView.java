@@ -5,14 +5,18 @@ import dev.vegui.eventdeck.Routes;
 import dev.vegui.eventdeck.View;
 import dev.vegui.eventdeck.components.DetailField;
 import dev.vegui.eventdeck.model.Event;
+import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.services.EventService;
+import dev.vegui.eventdeck.services.TicketService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 public class EventDetailsView extends View {
     private EventService eventService;
+    private TicketService ticketService;
     private Event event;
 
     // Components
@@ -24,6 +28,7 @@ public class EventDetailsView extends View {
     public EventDetailsView() {
 
         this.eventService = Main.getService(EventService.class);
+        this.ticketService = Main.getService(TicketService.class);
 
         setLayout(new BorderLayout());
         this.navPanel = new JPanel(new BorderLayout());
@@ -45,10 +50,16 @@ public class EventDetailsView extends View {
         editButton.addActionListener(e -> {
             getMainState().getRouter().navigate(Routes.EVENT_EDIT);
         });
+        JButton createTicketButton = new JButton("Crear ticket");
+        createTicketButton.addActionListener(e -> {
+            getMainState().setCurrentTicket(null);
+            getMainState().getRouter().navigate(Routes.TICKET_CREATE);
+        });
         JButton deleteButton = new JButton("Borrar");
         deleteButton.addActionListener(this::onDelete);
 
         rightNav.add(editButton);
+        rightNav.add(createTicketButton);
         rightNav.add(deleteButton);
 
         navPanel.add(leftNav, BorderLayout.WEST);
@@ -123,8 +134,65 @@ public class EventDetailsView extends View {
         ));
 
         wrapperPanel.add(detailsPanel);
+        wrapperPanel.add(Box.createVerticalStrut(detailsGap));
+        wrapperPanel.add(buildTicketsPanel());
         wrapperPanel.revalidate();
         wrapperPanel.repaint();
+    }
+
+    private JPanel buildTicketsPanel() {
+        JPanel ticketsPanel = new JPanel();
+        ticketsPanel.setLayout(new BoxLayout(ticketsPanel, BoxLayout.Y_AXIS));
+        ticketsPanel.setBorder(BorderFactory.createTitledBorder("Tickets"));
+        ticketsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        List<Ticket> tickets = ticketService.findByEvent(event);
+
+        if (tickets.isEmpty()) {
+            ticketsPanel.add(new JLabel("No hay tickets creados"));
+        }
+
+        for (Ticket ticket : tickets) {
+            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            row.add(new JLabel(ticket.getCode()));
+            row.add(Box.createHorizontalStrut(12));
+            row.add(new JLabel(ticket.getAttendeeName()));
+            row.add(Box.createHorizontalStrut(12));
+            row.add(new JLabel(ticket.getAttendeeEmail()));
+            row.add(Box.createHorizontalStrut(12));
+            row.add(new JLabel(getTicketStatus(ticket)));
+
+            JButton editTicketButton = new JButton("Editar");
+            editTicketButton.addActionListener(e -> {
+                ticket.setEvent(event);
+                getMainState().setCurrentTicket(ticket);
+                getMainState().getRouter().navigate(Routes.TICKET_EDIT);
+            });
+            row.add(editTicketButton);
+
+            ticketsPanel.add(row);
+        }
+
+        ticketsPanel.setMaximumSize(new Dimension(
+                Integer.MAX_VALUE,
+                ticketsPanel.getPreferredSize().height
+        ));
+
+        return ticketsPanel;
+    }
+
+    private String getTicketStatus(Ticket ticket) {
+        if (ticket.getDeletedAt() != null) {
+            return "Eliminado";
+        }
+
+        if (ticket.getAttendedAt() != null) {
+            return "Asistió";
+        }
+
+        return "Pendiente";
     }
 
     private void onDelete(ActionEvent e) {
