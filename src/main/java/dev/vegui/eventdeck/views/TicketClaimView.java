@@ -31,12 +31,12 @@ public class TicketClaimView extends View {
 
         setLayout(new BorderLayout());
 
-        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
         JButton backButton = new JButton("Volver");
         backButton.addActionListener(e -> getMainState().getRouter().navigate(Routes.EVENTS_LIST));
         navPanel.add(backButton);
 
-        JLabel title = new JLabel("Claim ticket");
+        JLabel title = new JLabel("Canjear Ticket");
         title.setFont(
                 title.getFont().deriveFont(Font.BOLD, 18f)
         );
@@ -44,53 +44,74 @@ public class TicketClaimView extends View {
         add(navPanel, BorderLayout.NORTH);
 
         JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-        wrapper.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        wrapper.setLayout(new BorderLayout());
+        wrapper.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
         add(wrapper, BorderLayout.CENTER);
 
+        JPanel contentPanel = new JPanel(new GridLayout(1, 2, 16, 0));
+        contentPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
+
         JPanel manualPanel = new JPanel();
-        manualPanel.setLayout(new BoxLayout(manualPanel, BoxLayout.Y_AXIS));
+        manualPanel.setLayout(new GridBagLayout());
         manualPanel.setBorder(BorderFactory.createTitledBorder("Código"));
-        manualPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(8, 10, 6, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        manualPanel.add(new JLabel("Código del ticket"), gbc);
+
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 10, 10, 8);
         codeInput = new JTextField(24);
-        codeInput.setMaximumSize(new Dimension(360, codeInput.getPreferredSize().height));
-        manualPanel.add(new JLabel("Código del ticket"));
-        manualPanel.add(codeInput);
+        manualPanel.add(codeInput, gbc);
 
-        JPanel manualActions = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton claimButton = new JButton("Claim");
+        gbc.gridx = 1;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(0, 0, 10, 10);
+        JButton claimButton = new JButton("Canjear");
         claimButton.addActionListener(e -> claimCode(codeInput.getText()));
-        manualActions.add(claimButton);
-        manualPanel.add(manualActions);
-
-        wrapper.add(manualPanel);
-        wrapper.add(Box.createVerticalStrut(16));
+        manualPanel.add(claimButton, gbc);
 
         JPanel qrPanel = new JPanel();
-        qrPanel.setLayout(new BoxLayout(qrPanel, BoxLayout.Y_AXIS));
+        qrPanel.setLayout(new GridBagLayout());
         qrPanel.setBorder(BorderFactory.createTitledBorder("QR"));
-        qrPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JPanel qrActions = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton fileButton = new JButton("Cargar imagen");
+        GridBagConstraints qrGbc = new GridBagConstraints();
+        qrGbc.gridx = 0;
+        qrGbc.gridy = 0;
+        qrGbc.gridwidth = 2;
+        qrGbc.fill = GridBagConstraints.HORIZONTAL;
+        qrGbc.weightx = 1;
+        qrGbc.insets = new Insets(8, 10, 8, 10);
+        qrGbc.anchor = GridBagConstraints.WEST;
+
+        JPanel qrActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JButton fileButton = new JButton("Cargar QR");
         fileButton.addActionListener(this::onLoadImage);
-        JButton pasteButton = new JButton("Pegar imagen");
+        JButton pasteButton = new JButton("Pegar QR");
         pasteButton.addActionListener(this::onPasteImage);
         qrActions.add(fileButton);
         qrActions.add(pasteButton);
-        qrPanel.add(qrActions);
+        qrPanel.add(qrActions, qrGbc);
 
         imageStatusLabel = new JLabel("Sin imagen cargada");
-        imageStatusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        qrPanel.add(imageStatusLabel);
+        qrGbc.gridy++;
+        qrGbc.insets = new Insets(0, 14, 10, 10);
+        qrPanel.add(imageStatusLabel, qrGbc);
 
-        wrapper.add(qrPanel);
-        wrapper.add(Box.createVerticalStrut(16));
+        contentPanel.add(manualPanel);
+        contentPanel.add(qrPanel);
+        wrapper.add(contentPanel, BorderLayout.NORTH);
 
         statusLabel = new JLabel(" ");
-        statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        wrapper.add(statusLabel);
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(12, 4, 0, 4));
+        wrapper.add(statusLabel, BorderLayout.CENTER);
     }
 
     @Override
@@ -214,7 +235,7 @@ public class TicketClaimView extends View {
         JOptionPane.showMessageDialog(
                 this,
                 message,
-                "Claim ticket",
+                "Canjear Ticket",
                 JOptionPane.WARNING_MESSAGE
         );
     }

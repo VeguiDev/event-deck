@@ -1,7 +1,6 @@
 package dev.vegui.eventdeck.components;
 
 import dev.vegui.eventdeck.Main;
-import dev.vegui.eventdeck.MainFrame;
 import dev.vegui.eventdeck.Routes;
 
 import javax.swing.*;
@@ -20,7 +19,7 @@ public class EventListHeader extends JPanel {
                 label.getFont().deriveFont(Font.BOLD, 18f)
         );
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton claimButton = new JButton("Claim ticket");
+        JButton claimButton = new JButton("Canjear Ticket");
         JButton button = new JButton("Crear");
 
         claimButton.addActionListener((e) -> {

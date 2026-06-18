@@ -34,6 +34,30 @@ public class EventsGrid extends JPanel {
     private void updateEventCards() {
 
         this.removeAll();
+
+        if (events.isEmpty()) {
+            setLayout(new BorderLayout());
+
+            JLabel emptyLabel = new JLabel("Aún no hay eventos");
+            emptyLabel.setFont(
+                    emptyLabel.getFont().deriveFont(Font.BOLD, 16f)
+            );
+            emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+            JPanel emptyPanel = new JPanel(new BorderLayout());
+            emptyPanel.setBorder(BorderFactory.createEmptyBorder(48, 16, 16, 16));
+            emptyPanel.add(emptyLabel, BorderLayout.NORTH);
+            this.add(emptyPanel, BorderLayout.CENTER);
+
+            revalidate();
+            repaint();
+            return;
+        }
+
+        setLayout(
+                new GridLayout(0, 3, 16, 16)
+        );
+
         for (Event event : events) {
             JPanel wrapper = new JPanel();
             EventCard card = new EventCard(event);
@@ -41,6 +65,8 @@ public class EventsGrid extends JPanel {
             this.add(wrapper);
         }
 
+        revalidate();
+        repaint();
     }
 
 }

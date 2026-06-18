@@ -8,11 +8,13 @@ import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.services.TicketService;
 import dev.vegui.eventdeck.util.QRUtils;
+import dev.vegui.eventdeck.util.TicketPdfGenerator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -136,9 +138,15 @@ public class TicketDetailsView extends View {
         codeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         codeLabel.setFont(codeLabel.getFont().deriveFont(Font.BOLD, 20));
 
+        JButton exportButton = new JButton("Exportar PDF");
+        exportButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        exportButton.addActionListener(this::onExportPdf);
+
         rightPanel.add(qrLabel);
         rightPanel.add(Box.createVerticalStrut(10));
         rightPanel.add(codeLabel);
+        rightPanel.add(Box.createVerticalStrut(14));
+        rightPanel.add(exportButton);
         rightPanel.setPreferredSize(new Dimension(260, rightPanel.getPreferredSize().height));
 
         contentPanel.add(rightPanel, BorderLayout.EAST);
@@ -161,6 +169,46 @@ public class TicketDetailsView extends View {
         if (option == JOptionPane.YES_OPTION) {
             ticketService.softDelete(ticket);
             reload();
+        }
+    }
+
+    private void onExportPdf(ActionEvent e) {
+        if (ticket == null) return;
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setDialogTitle("Seleccionar carpeta para exportar");
+
+        int option = chooser.showOpenDialog(this);
+
+        if (option != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File folder = chooser.getSelectedFile();
+        File output = new File(folder, "ticket-" + sanitizeFileName(ticket.getCode()) + ".pdf");
+
+        try {
+            TicketPdfGenerator.generate(
+                    output.getAbsolutePath(),
+                    getEventLabel(),
+                    valueOrEmpty(ticket.getAttendeeName()),
+                    valueOrEmpty(ticket.getCode())
+            );
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ticket exportado en:\n" + output.getAbsolutePath(),
+                    "Exportar PDF",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
+                    "Exportar PDF",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -201,6 +249,10 @@ public class TicketDetailsView extends View {
 
     private String valueOrEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    private String sanitizeFileName(String value) {
+        return valueOrEmpty(value).replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
     private void navigateBack() {
