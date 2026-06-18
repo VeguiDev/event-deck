@@ -9,6 +9,7 @@ import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.services.TicketService;
 import dev.vegui.eventdeck.util.QRUtils;
 import dev.vegui.eventdeck.util.TicketPdfGenerator;
+import dev.vegui.eventdeck.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -90,7 +91,7 @@ public class TicketDetailsView extends View {
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
         detailsPanel.setBorder(BorderFactory.createTitledBorder("Resumen"));
         detailsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         detailsPanel.add(new DetailField("Nombre del asistente", valueOrEmpty(ticket.getAttendeeName())));
         detailsPanel.add(Box.createVerticalStrut(detailsGap));
         detailsPanel.add(new DetailField("Email del asistente", valueOrEmpty(ticket.getAttendeeEmail())));
@@ -191,9 +192,8 @@ public class TicketDetailsView extends View {
         try {
             TicketPdfGenerator.generate(
                     output.getAbsolutePath(),
-                    getEventLabel(),
-                    valueOrEmpty(ticket.getAttendeeName()),
-                    valueOrEmpty(ticket.getCode())
+                    Main.getState().getCurrentEvent(),
+                    ticket
             );
 
             JOptionPane.showMessageDialog(
@@ -202,6 +202,9 @@ public class TicketDetailsView extends View {
                     "Exportar PDF",
                     JOptionPane.INFORMATION_MESSAGE
             );
+
+            Util.openFile(output);
+
         } catch (RuntimeException ex) {
             JOptionPane.showMessageDialog(
                     this,
