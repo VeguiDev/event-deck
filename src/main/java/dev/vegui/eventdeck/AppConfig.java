@@ -1,21 +1,17 @@
 package dev.vegui.eventdeck;
 
-import java.io.InvalidClassException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class AppConfig implements Serializable {
+    private static final SMTPConfig DEFAULT_SMTP_CONFIG = new SMTPConfig(false, null, null, 587, null, null);
+
     private static final long serialVersionUID = 1L;
 
     private boolean fristRun = true;
 
-    private SMTPConfig smtpConfig;
+    private SMTPConfig smtpConfig = DEFAULT_SMTP_CONFIG;
 
     private boolean autoSendTicket;
 
@@ -32,6 +28,10 @@ public class AppConfig implements Serializable {
     }
 
     public SMTPConfig getSmtpConfig() {
+        if (smtpConfig == null) {
+            smtpConfig = DEFAULT_SMTP_CONFIG;
+        }
+
         return smtpConfig;
     }
 
@@ -60,7 +60,7 @@ public class AppConfig implements Serializable {
             output.writeObject(this);
         }
     }
-    
+
     public record SMTPConfig(
             boolean enabled,
             String sender,

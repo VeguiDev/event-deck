@@ -68,11 +68,7 @@ public class TicketExporter {
         sb.append("<html>");
         sb.append("<h2><b>Entrada EventDeck</b></h2>");
 
-        BufferedImage qrImage = QRUtils.generateQR("ticket:" + ticket.getCode(), 250);
-
-        String base64 = Util.toDataPngBase64(qrImage);
-
-        sb.append("<img src=\"" + base64 + "\" width=\"250\" />");
+        sb.append("<img src=\"cid:ticket-qr\" width=\"250\" />");
 
         sb.append("<p><b>Evento:</b> " + event.getTitle() + "</p>");
         sb.append("<p><b>Asistente:</b> " + ticket.getAttendeeName() + "</p>");

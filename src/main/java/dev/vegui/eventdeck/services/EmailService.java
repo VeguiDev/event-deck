@@ -7,6 +7,8 @@ import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.MailerBuilder;
 
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class EmailService {
@@ -45,7 +47,15 @@ public class EmailService {
         buildMailer();
     }
 
-    public void sendMail(String to, String subject, String text, String html) {
+    public void sendMail(String to, String subject, String text, String html, Map<String, byte[]> attachments) {
+
+        CompletableFuture.runAsync(() -> {
+            sendMailAsync(to, subject, text, html, attachments);
+        });
+
+    }
+
+    public void sendMailAsync(String to, String subject, String text, String html, Map<String, byte[]> attachments) {
 
         if (!Main.getAppConfig().getSmtpConfig().enabled()) return;
 
@@ -61,6 +71,12 @@ public class EmailService {
 
         if (html != null) {
             builder = builder.withHTMLText(html);
+        }
+
+        if (attachments != null) {
+            for (Map.Entry<String, byte[]> entry : attachments.entrySet()) {
+                builder.withEmbeddedImage(entry.getKey(), entry.getValue(), "image/png");
+            }
         }
 
         this.mailer.sendMail(builder.buildEmail());

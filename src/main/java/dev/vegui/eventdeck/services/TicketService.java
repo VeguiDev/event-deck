@@ -4,11 +4,16 @@ import dev.vegui.eventdeck.Main;
 import dev.vegui.eventdeck.model.Event;
 import dev.vegui.eventdeck.model.Ticket;
 import dev.vegui.eventdeck.repository.TicketRepository;
+import dev.vegui.eventdeck.util.QRUtils;
 import dev.vegui.eventdeck.util.TicketExporter;
 import dev.vegui.eventdeck.util.Validators;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -117,16 +122,27 @@ public class TicketService {
             Main.logger.log(Level.WARNING, "Email notification has been disabled, ignoring.");
             return;
         }
-        
+
         try {
             String plainText = TicketExporter.exportToString(ticket, event);
             String htmlText = TicketExporter.exportToHTML(ticket, event);
+
+            BufferedImage qrImage = QRUtils.generateQR("ticket:" + ticket.getCode(), 250);
+
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ImageIO.write(qrImage, "png", output);
+
+            byte[] qrBytes = output.toByteArray();
 
             this.emailService.sendMail(
                     ticket.getAttendeeEmail(),
                     "EventDeck: Te han invitado a participar de este evento.",
                     plainText,
-                    htmlText
+                    htmlText,
+                    Map.of(
+                            "ticket-qr",
+                            qrBytes
+                    )
             );
 
         } catch (Exception e1) {
