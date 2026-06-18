@@ -1,7 +1,11 @@
 package dev.vegui.eventdeck.util;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Base64;
 
 public class Util {
 
@@ -34,5 +38,21 @@ public class Util {
             throw new RuntimeException("No se pudo abrir el archivo", e);
         }
     }
+
+    public static String toDataPngBase64(BufferedImage image) {
+        try {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            ImageIO.write(image, "png", output);
+
+            byte[] imageBytes = output.toByteArray();
+            String base64 = Base64.getEncoder().encodeToString(imageBytes);
+
+            return "data:image/png;base64," + base64;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not convert image to base64 PNG", e);
+        }
+    }
+
 
 }

@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class TicketExporter {
 
@@ -62,10 +63,17 @@ public class TicketExporter {
         return sb.toString();
     }
 
-    public static String exportToHTML(Ticket ticket, Event event) {
+    public static String exportToHTML(Ticket ticket, Event event) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
         sb.append("<h2><b>Entrada EventDeck</b></h2>");
+
+        BufferedImage qrImage = QRUtils.generateQR("ticket:" + ticket.getCode(), 250);
+
+        String base64 = Util.toDataPngBase64(qrImage);
+
+        sb.append("<img src=\"" + base64 + "\" width=\"250\" />");
+
         sb.append("<p><b>Evento:</b> " + event.getTitle() + "</p>");
         sb.append("<p><b>Asistente:</b> " + ticket.getAttendeeName() + "</p>");
         sb.append("<p><b>Dirección:</b> " + event.getLocation().getFormattedAddress() + "</p>");
