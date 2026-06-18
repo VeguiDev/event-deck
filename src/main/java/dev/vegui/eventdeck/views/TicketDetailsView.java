@@ -190,7 +190,7 @@ public class TicketDetailsView extends View {
         File output = new File(folder, "ticket-" + sanitizeFileName(ticket.getCode()) + ".pdf");
 
         try {
-            TicketExporter.generate(
+            TicketExporter.exportToPDF(
                     output.getAbsolutePath(),
                     Main.getState().getCurrentEvent(),
                     ticket

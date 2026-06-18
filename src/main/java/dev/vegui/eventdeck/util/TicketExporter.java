@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 
 public class TicketExporter {
 
-    public static void generate(String path, Event event, Ticket ticket) {
+    public static void exportToPDF(String path, Event event, Ticket ticket) {
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(path));
@@ -43,5 +43,37 @@ public class TicketExporter {
         } catch (Exception e) {
             throw new RuntimeException("No se pudo generar el PDF de la entrada", e);
         }
+    }
+
+    public static String exportToString(Ticket ticket, Event event) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Entrada EventDeck\n\n");
+        sb.append("Evento: " + event.getTitle());
+        sb.append("\n");
+        sb.append("Asistente: " + ticket.getAttendeeName());
+        sb.append("\n");
+        sb.append("Dirección: " + event.getLocation().getFormattedAddress());
+        sb.append("\n");
+        sb.append("Fecha: " + event.getStartDate().toString());
+        sb.append("\n");
+        sb.append("Código: " + ticket.getCode());
+
+        return sb.toString();
+    }
+
+    public static String exportToHTML(Ticket ticket, Event event) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        sb.append("<h2><b>Entrada EventDeck</b></h2>");
+        sb.append("<p><b>Evento:</b> " + event.getTitle() + "</p>");
+        sb.append("<p><b>Asistente:</b> " + ticket.getAttendeeName() + "</p>");
+        sb.append("<p><b>Dirección:</b> " + event.getLocation().getFormattedAddress() + "</p>");
+        sb.append("<p><b>Fecha:</b> " + event.getStartDate().toString() + "</p>");
+        sb.append("<p><b>Código:</b> " + ticket.getCode() + "</p>");
+
+        sb.append("</html>");
+
+        return sb.toString();
     }
 }
